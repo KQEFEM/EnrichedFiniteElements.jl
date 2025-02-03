@@ -49,15 +49,15 @@ function grads_matrix(grad_matrix::AbstractMatrix{<:Real})
     return grad_matrix
 end
 
-function e_space(x::Real, y::Real, t::Real, A::Real, B::Real, C::Real)
+function enrich_space(x::Real, y::Real, t::Real, A::Real, B::Real, C::Real)
     """
-    Defines the spatial enrichment function.
+    Defines the spatial enrichment function. This includes the rearrangment for G * conj(G*)
 
     Args:
         x: x-coordinate.
         y: y-coordinate.
-        A: Parameter A.
-        B: Parameter B.
+        A: Parameter A: see matlab code.
+        B: Parameter B: : see matlab code.
         C: Parameter C.
 
     Returns:
@@ -66,7 +66,7 @@ function e_space(x::Real, y::Real, t::Real, A::Real, B::Real, C::Real)
     return exp(1im * (A * x + B * y + C))  # 1im represents the imaginary unit
 end
 
-function e_time_mass(x::Real,y::Real,t::Real, w::Real, dt::Real, t0::Real, ww::Real)
+function e_time_mass(x::Real,y::Real,t::Real, w::Vector{Float64}, dt::Real, t0::Real, ww::Vector{Float64})
     """
     Defines the time enrichment function for the mass term.
 
@@ -83,13 +83,13 @@ function e_time_mass(x::Real,y::Real,t::Real, w::Real, dt::Real, t0::Real, ww::R
     return exp(1im * w * dt) * exp(-1im * ww * (t - t0))
 end
 
-function e_time_ansatz(x::Real, y::Real, t::Real, w::Real)
+function enrichment_time(x::Real, y::Real, t::Real, w::Float64)
     """
     Defines the time enrichment function for the ansatz function.
 
     Args:
         t: Time.
-        w: Parameter w.
+        w: Parameter w. Includes the w - ww
 
     Returns:
         A complex number.
@@ -97,7 +97,7 @@ function e_time_ansatz(x::Real, y::Real, t::Real, w::Real)
     return exp(1im * w * t)
 end
 
-function e_time_test(x::Real, y::Real, t::Real, ww::Real)
+function e_time_test(x::Real, y::Real, t::Real, ww::Vector{Float64})
     """
     Defines the time enrichment function for the test function.
 
