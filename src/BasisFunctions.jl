@@ -1,6 +1,6 @@
 module BasisFunctions
 
-# export all
+export all
 
 function phi(x::Real, y::Real)
     """
