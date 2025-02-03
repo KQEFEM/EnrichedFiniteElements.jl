@@ -1,6 +1,6 @@
 module BasisFunctions
 
-export phi, p_matrix, e_space, e_time_mass, e_time_ansatz, e_time_test  
+# export all
 
 function phi(x::Real, y::Real)
     """
@@ -28,7 +28,25 @@ function p_matrix(x::Real, y::Real)
         A 3x3 matrix.
     """
     phi_val = phi(x, y)
+    println(phi_val)
     return phi_val * phi_val'  # Use * for matrix multiplication
+end
+
+function grads_matrix(grad_matrix::AbstractMatrix{<:Real})
+    """
+    Defines the grads matrix (3x3) from a given matrix.
+
+    Args:
+       grad_matrix: 3x3 matrix
+
+    Returns:
+        A 3x3 matrix.
+    """
+    rows, cols = size(grad_matrix)
+    if rows != 3 || cols != 3
+        error("Input matrix must be 3x3.")
+    end
+    return grad_matrix
 end
 
 function e_space(x::Real, y::Real, A::Real, B::Real, C::Real)
@@ -92,3 +110,5 @@ function e_time_test(t::Real, ww::Real)
     """
     return exp(-1im * ww * t)
 end
+
+end 
