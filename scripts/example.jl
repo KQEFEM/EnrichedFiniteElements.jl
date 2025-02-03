@@ -19,11 +19,14 @@ grad_matrix = basis.grads_matrix(grad_matrix_input)
 
 upper_bounds = [1.0, 1.0, 1.0]
 lower_bounds = [0.0, 0.0, 0.0]
-A = [0.0,0.0]
-B = [0.0,0]
-C = [0.0,0]
+A = 0.0
+B = 0.0
+C = 0.0
 omega = [0.0,0] 
-
+# A = 1.0 
+# B = 0.2 
+# C = 0.8
+# omega = [3.0, - 3]
 const operators = EnrichedFiniteElements.Operators
 result, _ = operators.pDtq(upper_bounds, lower_bounds, A, B, C,omega) # Correct call
 println(result)

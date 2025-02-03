@@ -33,16 +33,16 @@ using .BasisFunctions  # Assuming BasisFunctions.jl is in the same directory or 
         @test_throws ErrorException BasisFunctions.grads_matrix(grad_matrix_bad_size)
     end
 
-    @testset "e_space" begin
+    @testset "enrich_space" begin
         x = 0.2
         y = 0.3
         t = 0.0
         A = 1.0
         B = 2.0
         C = 0.0
-        e_space_val = BasisFunctions.e_space(x, y, t, A, B, C)
-        @test isa(e_space_val, Complex) # Check type
-        @test e_space_val ≈ exp(1im * (A * x + B * y + C)) # Check value
+        enrich_space_val = BasisFunctions.enrich_space(x, y, t, A, B, C)
+        @test isa(enrich_space_val, Complex) # Check type
+        @test enrich_space_val ≈ exp(1im * (A * x + B * y + C)) # Check value
     end
 
 
@@ -58,7 +58,7 @@ using .BasisFunctions  # Assuming BasisFunctions.jl is in the same directory or 
         e_mass = BasisFunctions.e_time_mass(x,y,t, w, dt, t0, ww)
         @test isa(e_mass, Complex)
 
-        e_ansatz = BasisFunctions.e_time_ansatz(x,y,t, w)
+        e_ansatz = BasisFunctions.enrichment_time(x,y,t, w)
         @test isa(e_ansatz, Complex)
 
         e_test = BasisFunctions.e_time_test(x,y,t, ww)

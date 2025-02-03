@@ -23,12 +23,23 @@ function hat_wrapper(v,f)
     return f(x,y,z)
 end 
 
-function e_space_wrap(v)
-    return space_enrichment_wrapper(v, BasisFunctions.e_space ,A_val, B_val, C_val) # Or helper.space_enrichment_wrapper if aliased
+function grads_wrapper(v,f,grads_matrix)
+    x = v[1]
+    y = v[2]
+    z = v[3]
+    return f(x,y,z)
+end 
+
+function grads_wrap(v)
+    """ Simply wraps the gradients matrix to allow for integration """
+    grads_wrapper(v, BasisFunctions.grads_matrix, grads_matrix)
+end
+function enrich_space_wrap(v)
+    return space_enrichment_wrapper(v, BasisFunctions.enrich_space ,A_val, B_val, C_val) # Or helper.space_enrichment_wrapper if aliased
 end
 
 function e_time_wrap(v)
-    return time_enrichment_wrapper(v, BasisFunctions.e_time_ansatz, omega)
+    return time_enrichment_wrapper(v, BasisFunctions.enrichment_time, omega)
 end 
 
 function hat_wrap(v)
