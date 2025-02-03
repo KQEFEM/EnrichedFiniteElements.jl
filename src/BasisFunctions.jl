@@ -2,7 +2,7 @@ module BasisFunctions
 
 export all
 
-function phi(x::Real, y::Real)
+function phi(x::Real, y::Real,z::Real=0.0)
     """
     Defines the Phi basis functions for a linear triangle.
 
@@ -16,7 +16,7 @@ function phi(x::Real, y::Real)
     return [1 - x - y; x; y]
 end
 
-function p_matrix(x::Real, y::Real)
+function p_matrix(x::Real, y::Real,z::Real=0)
     """
     Defines the P matrix (Phi * Phi').
 
@@ -49,7 +49,7 @@ function grads_matrix(grad_matrix::AbstractMatrix{<:Real})
     return grad_matrix
 end
 
-function e_space(x::Real, y::Real, A::Real, B::Real, C::Real)
+function e_space(x::Real, y::Real, t::Real, A::Real, B::Real, C::Real)
     """
     Defines the spatial enrichment function.
 
@@ -66,7 +66,7 @@ function e_space(x::Real, y::Real, A::Real, B::Real, C::Real)
     return exp(1im * (A * x + B * y + C))  # 1im represents the imaginary unit
 end
 
-function e_time_mass(t::Real, w::Real, dt::Real, t0::Real, ww::Real)
+function e_time_mass(x::Real,y::Real,t::Real, w::Real, dt::Real, t0::Real, ww::Real)
     """
     Defines the time enrichment function for the mass term.
 
@@ -83,7 +83,7 @@ function e_time_mass(t::Real, w::Real, dt::Real, t0::Real, ww::Real)
     return exp(1im * w * dt) * exp(-1im * ww * (t - t0))
 end
 
-function e_time_ansatz(t::Real, w::Real)
+function e_time_ansatz(x::Real, y::Real, t::Real, w::Real)
     """
     Defines the time enrichment function for the ansatz function.
 
@@ -97,7 +97,7 @@ function e_time_ansatz(t::Real, w::Real)
     return exp(1im * w * t)
 end
 
-function e_time_test(t::Real, ww::Real)
+function e_time_test(x::Real, y::Real, t::Real, ww::Real)
     """
     Defines the time enrichment function for the test function.
 

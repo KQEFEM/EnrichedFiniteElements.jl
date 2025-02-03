@@ -36,29 +36,32 @@ using .BasisFunctions  # Assuming BasisFunctions.jl is in the same directory or 
     @testset "e_space" begin
         x = 0.2
         y = 0.3
+        t = 0.0
         A = 1.0
         B = 2.0
         C = 0.0
-        e_space_val = BasisFunctions.e_space(x, y, A, B, C)
+        e_space_val = BasisFunctions.e_space(x, y, t, A, B, C)
         @test isa(e_space_val, Complex) # Check type
         @test e_space_val ≈ exp(1im * (A * x + B * y + C)) # Check value
     end
 
 
     @testset "e_time functions" begin
+        x = 0.0
+        y = 0.0
         t = 0.1
         w = 1.0
         dt = 0.01
         t0 = 0.0
         ww = 2.0
 
-        e_mass = BasisFunctions.e_time_mass(t, w, dt, t0, ww)
+        e_mass = BasisFunctions.e_time_mass(x,y,t, w, dt, t0, ww)
         @test isa(e_mass, Complex)
 
-        e_ansatz = BasisFunctions.e_time_ansatz(t, w)
+        e_ansatz = BasisFunctions.e_time_ansatz(x,y,t, w)
         @test isa(e_ansatz, Complex)
 
-        e_test = BasisFunctions.e_time_test(t, ww)
+        e_test = BasisFunctions.e_time_test(x,y,t, ww)
         @test isa(e_test, Complex)
 
     end
