@@ -1,10 +1,12 @@
 module EnrichedFiniteElements
 
-include("Operators.jl")
-include("BasisFunctions.jl")
+include("BasisFunctions.jl")  # Include BasisFunctions FIRST
+using .BasisFunctions       # Use BasisFunctions
 
-# export Operators, BasisFunctions # Export the *modules themselves*
+include("IntegrationWrappers.jl") # Include IntegrationWrappers SECOND
+using .IntegrationWrappers  # Use IntegrationWrappers
 
-# No need for individual function exports here
+include("Operators.jl")      # Include Operators LAST
+using .Operators           # Use Operators
 
-end
+end # module EnrichedFiniteElements
