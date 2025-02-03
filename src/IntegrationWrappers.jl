@@ -23,11 +23,15 @@ function hat_wrapper(v,f)
     return f(x,y,z)
 end 
 
-function grads_wrapper(v,f,grads_matrix)
+function grads_wrapper(v,f,grad_matrix_input::AbstractMatrix{<:Real})
+    """ Simply wraps the gradients matrix to allow for integration """
+
     x = v[1]
     y = v[2]
     z = v[3]
-    return f(x,y,z)
+    grad_matrix = f(grad_matrix_input, x, y, z)  # Pass the matrix AND x, y, z
+
+    return grad_matrix
 end 
 
 function grads_wrap(v)

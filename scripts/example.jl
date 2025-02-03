@@ -32,3 +32,11 @@ result, _ = operators.pDtq(upper_bounds, lower_bounds, A, B, C,omega) # Correct 
 println(result)
 
 size(result)
+
+grads_matrix_value = [  # Or use any method to create a 3x3 matrix
+    1.0 2.0 3.0;
+    4.0 5.0 6.0;
+    7.0 8.0 9.0
+]
+K = 1
+result, _ = operators.v_nabla_q(upper_bounds, lower_bounds, A, B, C,omega,grads_matrix_value,K) # Correct call

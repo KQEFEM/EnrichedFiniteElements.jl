@@ -32,7 +32,7 @@ function p_matrix(x::Real, y::Real,z::Real=0)
     return phi_val * phi_val'  # Use * for matrix multiplication
 end
 
-function grads_matrix(grad_matrix::AbstractMatrix{<:Real})
+function grads_matrix(grad_matrix::AbstractMatrix{<:Real}, x::Real=0, y::Real=0, z::Real=0)
     """
     Defines the grads matrix (3x3) from a given matrix.
 
