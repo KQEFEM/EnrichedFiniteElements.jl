@@ -16,4 +16,7 @@ using .MatrixCreation
 include("MeshCreation.jl")
 using .MeshCreation
 
+include("EnrichmentCreator.jl")
+using .EnrichmentCreator
+
 end  # module EnrichedFiniteElements
