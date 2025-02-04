@@ -43,12 +43,3 @@ result, _ = operators.v_nabla_q(upper_bounds, lower_bounds, A, B, C,omega,grads_
 size(result)
 
 
-
-domain = ((0,0),(1,1))
-num_nodes = 10
-const mesh_create = EnrichedFiniteElements.MeshCreation
-
-tri = mesh_create.generate_mesh(domain, num_nodes)
-
-mesh_create.plot_mesh(tri)
-

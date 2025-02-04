@@ -2,7 +2,7 @@
 
 julia_version = "1.11.3"
 manifest_format = "2.0"
-project_hash = "bb7b9fd3208b884b34e9ac79a1459176a1b3e19b"
+project_hash = "8655729e0e26c34f7c6343b615d9de04ececffcb"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -76,12 +76,6 @@ version = "0.4.7"
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 version = "1.11.0"
-
-[[deps.BinDeps]]
-deps = ["Libdl", "Pkg", "SHA", "URIParser", "Unicode"]
-git-tree-sha1 = "1289b57e8cf019aede076edab0587eb9644175bd"
-uuid = "9e28174c-4ba2-5203-b857-d8d62c4213ee"
-version = "1.0.2"
 
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1473,22 +1467,10 @@ git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
 uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
 version = "0.11.3"
 
-[[deps.Triangle]]
-deps = ["BinDeps", "Libdl"]
-git-tree-sha1 = "ea6029621372cad54dcb43095f68e98f889b0546"
-uuid = "56f361f5-126b-55db-87fb-1c71988fcde4"
-version = "0.3.2"
-
 [[deps.TriplotBase]]
 git-tree-sha1 = "4d4ed7f294cda19382ff7de4c137d24d16adc89b"
 uuid = "981d1d27-644d-49a2-9326-4793e63143c3"
 version = "0.1.0"
-
-[[deps.URIParser]]
-deps = ["Unicode"]
-git-tree-sha1 = "53a9f49546b8d2dd2e688d216421d050c9a31d0d"
-uuid = "30578b45-9adc-5946-b283-645ec420af67"
-version = "0.4.1"
 
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
