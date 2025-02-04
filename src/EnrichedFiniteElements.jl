@@ -1,4 +1,5 @@
 module EnrichedFiniteElements
+export generate_mesh, plot_mesh  # Explicitly export functions
 
 include("BasisFunctions.jl")  # Include BasisFunctions FIRST
 using .BasisFunctions       # Use BasisFunctions
@@ -9,4 +10,10 @@ using .IntegrationWrappers  # Use IntegrationWrappers
 include("Operators.jl")      # Include Operators LAST
 using .Operators           # Use Operators
 
-end # module EnrichedFiniteElements
+include("MatrixCreation.jl")
+using .MatrixCreation
+
+include("MeshCreation.jl")
+using .MeshCreation
+
+end  # module EnrichedFiniteElements

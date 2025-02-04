@@ -42,7 +42,7 @@ end
     end 
 
     function mass_jump(upper_bounds::Vector{Float64}, lower_bounds::Vector{Float64}, A_val::Float64, B_val::Float64, C_val::Float64, omega::Vector{Float64}, dt::Real,t0::Real)
-        """ 2D integral, for example int_{d\Omega_t} p^-[[ conj(q) ]]. This is the integral in 2D over the time boundary """
+        """ 2D integral, for example int_{d\\Omega_t} p^-[[ conj(q) ]]. This is the integral in 2D over the time boundary """
         function integrand(v)
             x = v[1]
             y = v[2]

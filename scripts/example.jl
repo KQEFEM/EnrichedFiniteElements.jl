@@ -41,3 +41,14 @@ grads_matrix_value = [  # Or use any method to create a 3x3 matrix
 K = 1
 result, _ = operators.v_nabla_q(upper_bounds, lower_bounds, A, B, C,omega,grads_matrix_value,K) # Correct call
 size(result)
+
+
+
+domain = ((0,0),(1,1))
+num_nodes = 10
+const mesh_create = EnrichedFiniteElements.MeshCreation
+
+tri = mesh_create.generate_mesh(domain, num_nodes)
+
+mesh_create.plot_mesh(tri)
+
