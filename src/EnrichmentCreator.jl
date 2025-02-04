@@ -8,6 +8,12 @@ function create_wavenumbers(x_enrichments::Real, y_enrichments::Real)
     
 end 
 
+function wavenumber_creation(wavenumbers_ansatz::Matrix{Real}, y_enrichments::Matrix{Real})
+    
+
+
+end 
+
 function combine_wavenumber_with_all_nodes(matrix_1, matrix_2)
     n_wavenumbers = size(matrix_1, 1)
     n_nodes = size(matrix_2, 1)
