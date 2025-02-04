@@ -4,4 +4,5 @@
 /docs/Manifest.toml
 /docs/build/
 *.DS_Store
-./mesh
+mesh/
+*.msh
