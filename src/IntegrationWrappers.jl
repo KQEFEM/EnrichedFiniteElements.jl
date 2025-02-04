@@ -34,6 +34,13 @@ function grads_wrapper(v,f,grad_matrix_input::AbstractMatrix{<:Real})
     return grad_matrix
 end 
 
+function mass_jump_wrapper(v,f, w::Vector{Float64}, dt::Real, t0::Real, ww::Vector{Float64})
+    x = v[1]
+    y = v[2]
+    z = v[3]
+    return f(x,y,z,w,dt,t0,ww)
+end 
+
 function grads_wrap(v)
     """ Simply wraps the gradients matrix to allow for integration """
     grads_wrapper(v, BasisFunctions.grads_matrix, grads_matrix)
