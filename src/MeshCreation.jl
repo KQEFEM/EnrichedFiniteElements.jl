@@ -1,6 +1,8 @@
 module MeshCreation
 
 using Gmsh, FileIO
+using Makie, CairoMakie
+using GeometryBasics
 
 export MeshData
 # Define a structure to hold the mesh data
@@ -9,7 +11,7 @@ struct MeshData
     elem_nodes::Vector{Vector{Int}} # Element nodes (list of node indices for each element)
     elem_types::Vector{Int}       # Element types (Gmsh element type codes)
     connectivity::Matrix{Int}     # Triangle connectivity (mx3 matrix)
-    boundary_nodes::Vector{Int}   # Unique boundary node indices
+    boundary_idx::Vector{Int}   # Unique boundary node indices
     boundary_edges::Matrix{Int}   # Edge connectivity (bx2 matrix)
 end
 
@@ -130,5 +132,39 @@ function extract_mesh_info(filename::String="rectangle_mesh.msh")
 
     return nodes, triangles
 end
+
+function plot_mesh(mesh)
+
+    nodes = mesh.nodes
+    connectivity = mesh.connectivity
+    boundary_index = mesh.boundary_idx
+    boundary_edges = mesh.boundary_edges
+    
+    # Create a figure and an axis *together*
+    fig = Figure()
+    ax = Axis(fig[1, 1], aspect = DataAspect()) #Aspect ratio is important
+
+    # Plot the elements (triangles)
+    n_triangles = length(connectivity) ÷ 3 #Number of triangles. Each triangle has 3 nodes
+    for i in 1:n_triangles
+        triangle_nodes = nodes[connectivity[i,:],:]
+        # triangle_nodes = @view connectivity[(i-1)*3+1:i*3] #Get the 3 nodes for the triangle
+        x_vals = triangle_nodes[:,1] #Correct indexing
+        y_vals = triangle_nodes[:, 2] #Correct indexing
+        lines!(ax, [x_vals..., x_vals[1]], [y_vals..., y_vals[1]], color=:black) # Plot into the axis
+    end
+
+    # Plot the boundary edges (highlighted) - Corrected
+    for edge in eachrow(boundary_edges)
+        x_vals = nodes[edge, 1]
+        y_vals = nodes[edge, 2]
+        lines!(ax, x_vals, y_vals, color=:red, linewidth=2, label = "Boundary Edges") # Plot the boundary edges
+    end
+
+
+# Legend(fig[1,2], ax) #Add legend
+
+    return fig #Display the figure
+end 
 
 end  # module MeshCreation
