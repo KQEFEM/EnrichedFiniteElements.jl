@@ -66,7 +66,7 @@ function enrich_space(x::Real, y::Real, t::Real, A::Real, B::Real, C::Real)
     return exp(1im * (A * x + B * y + C))  # 1im represents the imaginary unit
 end
 
-function e_time_mass(x::Real,y::Real,t::Real, w::Vector{Float64}, dt::Real, t0::Real, ww::Vector{Float64})
+function e_time_mass(x::Real,y::Real,t::Real, w::Float64, dt::Real, t0::Real, ww::Float64)
     """
     Defines the time enrichment function for the mass term.
 
