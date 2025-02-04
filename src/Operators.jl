@@ -39,6 +39,38 @@ end
         end
         integral_result = hcubature(integrand, lower_bounds, upper_bounds) # Use integrand
         return integral_result
-
     end 
+
+    function mass_jump(upper_bounds::Vector{Float64}, lower_bounds::Vector{Float64}, A_val::Float64, B_val::Float64, C_val::Float64, omega::Vector{Float64}, dt::Real,t0::Real)
+        """ 2D integral, for example int_{d\Omega_t} p^-[[ conj(q) ]]. This is the integral in 2D over the time boundary """
+        function integrand(v)
+            x = v[1]
+            y = v[2]
+            z = v[3]
+            space_enrichment = help.space_enrichment_wrapper([x, y, z], basis.enrich_space, A_val, B_val, C_val) # Pass vector, call enrich_space
+            time_enrichment = help.mass_jump_wrapper([x, y, z],basis.e_time_mass, omega[1], dt, t0, omega[2])
+            hat_ansatz = help.hat_wrapper([x, y, z], basis.phi) # Pass vector, call hat_function
+            hat_test = help.hat_wrapper([x, y, z], basis.phi) # Pass vector, call hat_function
+
+            return (hat_ansatz *  hat_test') * space_enrichment * time_enrichment
+        end
+        integral_result = hcubature(integrand, lower_bounds, upper_bounds) # Use integrand
+        return integral_result
+    end 
+
+    # function load_term()
+    #     function integrand(v)
+    #         x = v[1]
+    #         y = v[2]
+    #         z = v[3]
+    #         space_enrichment = help.space_enrichment_wrapper([x, y, z], basis.enrich_space, A_val, B_val, C_val) # Pass vector, call enrich_space
+    #         time_enrichment = help.mass_jump_wrapper([x, y, z],basis.e_time_mass, omega[1], dt, t0, omega[2])
+    #         hat_ansatz = help.hat_wrapper([x, y, z], basis.phi) # Pass vector, call hat_function
+    #         hat_test = help.hat_wrapper([x, y, z], basis.phi) # Pass vector, call hat_function
+
+    #         return (hat_ansatz *  hat_test') * space_enrichment * time_enrichment
+    #     end
+    #     integral_result = hcubature(integrand, lower_bounds, upper_bounds) # Use integrand
+    #     return integral_result
+    # end 
 end # End of module
