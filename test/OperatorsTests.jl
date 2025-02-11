@@ -31,7 +31,6 @@ using EnrichedFiniteElements
     ]
     result2,_ = EnrichedFiniteElements.Operators.pDtq(upper_bounds, lower_bounds, A, B, C, omega)
 
-    println(result2)
     @test isapprox(real(result2), real(expected_result2), atol=1e-6)
     @test isapprox(imag(result2), imag(expected_result2), atol=1e-6)
 

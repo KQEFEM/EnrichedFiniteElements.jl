@@ -36,7 +36,6 @@ end
     expected_wavenumbers = reshape(expected_wavenumbers, :, 1) # Reshape directly (no collect needed)
 
     actual_wavenumbers = wavenumber_func.create_wavenumbers(x_enrichments, y_enrichments)
-    println(actual_wavenumbers)
     @test actual_wavenumbers == expected_wavenumbers
 
     # Test case 2: Test with zero enrichments
@@ -63,7 +62,6 @@ end
     # Test 3: Single-row matrices
     single_row_mat1 = [9 10]
     single_row_mat2 = [11 12]
-    println( wavenumber_func.combine_wavenumber_with_all_nodes(single_row_mat1, single_row_mat2) )
     @test wavenumber_func.combine_wavenumber_with_all_nodes(single_row_mat1, single_row_mat2) ==  [([9, 10], [11, 12]);;]
 
 end

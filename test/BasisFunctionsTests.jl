@@ -19,7 +19,6 @@ using .BasisFunctions  # Assuming BasisFunctions.jl is in the same directory or 
         p_mat = BasisFunctions.p_matrix(x, y)
         @test size(p_mat) == (3, 3)
         phi_val = BasisFunctions.phi(x, y)
-        println(phi_val)
         @test p_mat ≈ phi_val * phi_val' # Check against the expected calculation
     end
 
