@@ -48,40 +48,33 @@ end
     @test actual_wavenumbers == expected_wavenumbers
 end
 
-@testset "combine_wavenumber_with_all_nodes" begin
-    # Smaller example wavenumbers (2 wavenumbers)
-    wavenumbers = [(-1, -1), (0, -1)]
-    wavenumbers = reshape(wavenumbers, :, 1)
-    println(wavenumbers)
+# Unit Tests
+@testset "combine_wavenumber_with_all_nodes Tests" begin
+    # Test 1: Basic functionality
+    mat1 = [1 2; 3 4]  # 2x2 matrix
+    mat2 = [5 6; 7 8]  # 2x2 matrix
 
-    # Smaller example nodes (2 nodes)
-    nodes = [[0.0, 0.0], [1.0, 0.0]]
-    nodes = reshape(nodes, :, 1)
-
-    # Call the function
-    combined_result = wavenumber_func.combine_wavenumber_with_all_nodes(wavenumbers, nodes)
-    println(combined_result)
-    # Expected result (manually constructed for clarity)
-    expected_result = [
-        ((-1, -1), [0.0, 0.0]),
-        ((-1, -1), [1.0, 0.0]),
-        ((0, -1), [0.0, 0.0]),
-        ((0, -1), [1.0, 0.0])
+    expected = [
+        ([1, 2], [5, 6]), 
+        ([1, 2], [7, 8]), 
+        ([3, 4], [5, 6]), 
+        ([3, 4], [7, 8])
     ]
+    
+    result = combine_wavenumber_with_all_nodes(mat1, mat2)
+    @test result == expected
 
-    # Test the result
-    @test combined_result == expected_result
+    # Test 2: Empty matrix case
+    empty_mat = Matrix{Int}(undef, 0, 2)  # Empty 0x2 matrix
+    @test combine_wavenumber_with_all_nodes(empty_mat, mat2) == []
+    @test combine_wavenumber_with_all_nodes(mat1, empty_mat) == []
 
-    # Test with a different number of nodes (1 node)
-    nodes2 = [[0.0, 0.0]]
-    nodes2 = reshape(nodes2, :, 1)
+    # Test 3: Single-row matrices
+    single_row_mat1 = [9 10]
+    single_row_mat2 = [11 12]
 
-    combined_result2 = wavenumber_func.combine_wavenumber_with_all_nodes(wavenumbers, nodes2)
-    println(combined_result2)
-    expected_result2 = [
-        ((-1, -1), [0.0, 0.0]),
-        ((0, -1), [0.0, 0.0]),
-    ]
-    @test combined_result2 == expected_result2
+    @test combine_wavenumber_with_all_nodes(single_row_mat1, single_row_mat2) == [([9, 10], [11, 12])]
 
+    # Test 4: Type stability check
+    @test eltype(combine_wavenumber_with_all_nodes(mat1, mat2)) == Tuple{Vector{Int}, Vector{Int}}
 end
