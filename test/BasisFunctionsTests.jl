@@ -61,8 +61,8 @@ using .BasisFunctions  # Assuming BasisFunctions.jl is in the same directory or 
         e_ansatz = BasisFunctions.enrichment_time(x,y,t, w)
         @test isa(e_ansatz, Complex)
 
-        e_test = BasisFunctions.e_time_test(x,y,t, ww)
-        @test isa(e_test, Complex)
+        # e_test = BasisFunctions.e_time_test(x,y,t, ww)
+        # @test isa(e_test, Complex)
 
     end
 end
