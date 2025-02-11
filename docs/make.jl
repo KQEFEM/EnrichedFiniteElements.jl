@@ -1,23 +1,16 @@
 using EnrichedFiniteElements
 using Documenter
 
-DocMeta.setdocmeta!(EnrichedFiniteElements, :DocTestSetup, :(using EnrichedFiniteElements); recursive=true)
-
-makedocs(;
-    modules=[EnrichedFiniteElements],
-    authors="Kieran Quaine",
-    sitename="EnrichedFiniteElements.jl",
-    format=Documenter.HTML(;
-        canonical="https://KQEFEM.github.io/EnrichedFiniteElements.jl",
-        edit_link="main",
-        assets=String[],
-    ),
-    pages=[
-        "Home" => "index.md",
-    ],
+# Build the documentation (Markdown format)
+makedocs(
+    modules = [EnrichedFiniteElements],  # Include your module
+    authors = "Kieran Quaine",           # Specify the author
+    format = Documenter.Markdown(),      # Use Markdown format
+    pages = ["Home" => "index.md"],      # Define the pages
 )
 
-deploydocs(;
-    repo="github.com/KQEFEM/EnrichedFiniteElements.jl",
-    devbranch="main",
+# Deploy the docs (ensure you have a GITHUB_TOKEN set for this to work)
+deploydocs(
+    repo = "github.com/KQEFEM/EnrichedFiniteElements.jl",  # Repository URL
+    devbranch = "main",                                    # Default branch
 )

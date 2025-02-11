@@ -1,0 +1,23 @@
+{
+  "name": "efem-julia",
+  "build": {
+    "dockerfile": "../docker/dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/opt/app",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/opt/app,type=bind,consistency=cached"
+  ],
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": [
+    "julialang.language-julia"
+  ],
+  "postCreateCommand": [
+    "/bin/bash",
+    "-c",
+    "julia -e 'using Pkg; Pkg.activate(\"/opt/app\"); Pkg.instantiate()'"
+  ],
+  "remoteUser": "myuser"
+}
