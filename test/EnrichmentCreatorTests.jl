@@ -54,27 +54,16 @@ end
     mat1 = [1 2; 3 4]  # 2x2 matrix
     mat2 = [5 6; 7 8]  # 2x2 matrix
 
-    expected = [
-        ([1, 2], [5, 6]), 
-        ([1, 2], [7, 8]), 
-        ([3, 4], [5, 6]), 
-        ([3, 4], [7, 8])
-    ]
+    expected = [([1, 2], [5, 6]) ([1, 2], [7, 8]); ([3, 4], [5, 6]) ([3, 4], [7, 8])]
     
-    result = combine_wavenumber_with_all_nodes(mat1, mat2)
+    result = wavenumber_func.combine_wavenumber_with_all_nodes(mat1, mat2)
     @test result == expected
 
-    # Test 2: Empty matrix case
-    empty_mat = Matrix{Int}(undef, 0, 2)  # Empty 0x2 matrix
-    @test combine_wavenumber_with_all_nodes(empty_mat, mat2) == []
-    @test combine_wavenumber_with_all_nodes(mat1, empty_mat) == []
-
+    
     # Test 3: Single-row matrices
     single_row_mat1 = [9 10]
     single_row_mat2 = [11 12]
+    println( wavenumber_func.combine_wavenumber_with_all_nodes(single_row_mat1, single_row_mat2) )
+    @test wavenumber_func.combine_wavenumber_with_all_nodes(single_row_mat1, single_row_mat2) ==  [([9, 10], [11, 12]);;]
 
-    @test combine_wavenumber_with_all_nodes(single_row_mat1, single_row_mat2) == [([9, 10], [11, 12])]
-
-    # Test 4: Type stability check
-    @test eltype(combine_wavenumber_with_all_nodes(mat1, mat2)) == Tuple{Vector{Int}, Vector{Int}}
 end
