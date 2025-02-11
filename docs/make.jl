@@ -1,6 +1,8 @@
 using EnrichedFiniteElements
 using Documenter
+using DocMeta
 
+# Set up the doctest environment
 DocMeta.setdocmeta!(
     EnrichedFiniteElements,
     :DocTestSetup,
@@ -8,16 +10,13 @@ DocMeta.setdocmeta!(
     recursive = true,
 )
 
-makedocs(;
+# Build the documentation (Markdown format)
+makedocs(
+    format = Documenter.Markdown(),
     modules = [EnrichedFiniteElements],
     authors = "Kieran Quaine",
-    sitename = "EnrichedFiniteElements.jl",
-    format = Documenter.HTML(;
-        canonical = "https://KQEFEM.github.io/EnrichedFiniteElements.jl",
-        edit_link = "main",
-        assets = String[],
-    ),
     pages = ["Home" => "index.md"],
 )
 
+# Deploy the docs (ensure you have a GITHUB_TOKEN set for this to work)
 deploydocs(; repo = "github.com/KQEFEM/EnrichedFiniteElements.jl", devbranch = "main")
