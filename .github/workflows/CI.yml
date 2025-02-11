@@ -1,3 +1,9 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
@@ -78,3 +84,32 @@ jobs:
           using EnrichedFiniteElements
           DocMeta.setdocmeta!(EnrichedFiniteElements, :DocTestSetup, :(using EnrichedFiniteElements); recursive=true)
           doctest(EnrichedFiniteElements)
+
+  format:
+    name: Format code
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to commit changes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "1"
+      - name: Install JuliaFormatter
+        shell: julia -e 'using Pkg; Pkg.add("JuliaFormatter")'
+      - name: Format code
+        shell: julia -e 'using JuliaFormatter; format(".")'
+      - name: Configure Git
+        run: |
+          git config --local user.name "GitHub Actions Bot"
+          git config --local user.email "actions@github.com"
+      - name: Check for changes and commit
+        run: |
+          git diff --staged --check # Optional: Check for style issues that formatter may not fix
+          if git diff --staged --quiet; then
+            echo "No formatting changes to commit."
+          else
+            git add .
+            git commit -m "Format code with JuliaFormatter"
+            git push
+          fi
