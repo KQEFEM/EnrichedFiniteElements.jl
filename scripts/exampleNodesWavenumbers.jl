@@ -20,7 +20,8 @@ n_wavenumbers = 3
 n_nodes = 5
 wavenumbers = rand(n_wavenumbers, 3)
 nodes = rand(n_nodes, 2)
-wavenumbers = [-1,0,1]; nodes =[-1,0,1];
+wavenumbers = [-1,0,1]; 
+nodes =[-1,0,1];
 combined = combine_wavenumber_with_all_nodes(wavenumbers, nodes)
 c = combine_wavenumber_with_all_nodes(combined, combined)
 
@@ -117,3 +118,18 @@ using EnrichedFiniteElements
 
 const  wave_func = EnrichedFiniteElements.EnrichmentCreator
 wave_func.create_wavenumbers(1,1)
+
+
+matrix_1 = rand(10, 3)  # Example 10x3 matrix
+matrix_2 = rand(5, 2)   # Example 5x2 matrix
+
+result = combine_wavenumber_with_all_nodes(matrix_1, matrix_2)
+
+# This will be for the looping
+nodes_idx = collect(1:size(nodes, 1))
+wavenumber_idx_ansatz = collect(1:size(matrix_1, 1))
+wavenumber_idx_test = wavenumber_idx_ansatz
+result_wavenumber_idx = combine_wavenumber_with_all_nodes(wavenumber_idx_ansatz,wavenumber_idx_test)
+
+#! This can be used to vectorise the computation as we just loop through this list
+wavenumber_connect_idx = combine_wavenumber_with_all_nodes(result_wavenumber_idx, connectivity)
