@@ -36,6 +36,7 @@ end
     expected_wavenumbers = reshape(expected_wavenumbers, :, 1) # Reshape directly (no collect needed)
 
     actual_wavenumbers = wavenumber_func.create_wavenumbers(x_enrichments, y_enrichments)
+    println(actual_wavenumbers)
     @test actual_wavenumbers == expected_wavenumbers
 
     # Test case 2: Test with zero enrichments
@@ -51,6 +52,7 @@ end
     # Smaller example wavenumbers (2 wavenumbers)
     wavenumbers = [(-1, -1), (0, -1)]
     wavenumbers = reshape(wavenumbers, :, 1)
+    println(wavenumbers)
 
     # Smaller example nodes (2 nodes)
     nodes = [[0.0, 0.0], [1.0, 0.0]]
@@ -58,7 +60,7 @@ end
 
     # Call the function
     combined_result = wavenumber_func.combine_wavenumber_with_all_nodes(wavenumbers, nodes)
-
+    println(combined_result)
     # Expected result (manually constructed for clarity)
     expected_result = [
         ((-1, -1), [0.0, 0.0]),
@@ -75,6 +77,7 @@ end
     nodes2 = reshape(nodes2, :, 1)
 
     combined_result2 = wavenumber_func.combine_wavenumber_with_all_nodes(wavenumbers, nodes2)
+    println(combined_result2)
     expected_result2 = [
         ((-1, -1), [0.0, 0.0]),
         ((0, -1), [0.0, 0.0]),

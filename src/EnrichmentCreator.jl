@@ -1,6 +1,6 @@
 module EnrichmentCreator
 using LinearAlgebra # Needed for norm
-
+using Base.Iterators
 
 function create_wavenumbers(x_enrichments::Real, y_enrichments::Real)
     """ Creates the wavenumber matrix to use """
@@ -36,18 +36,14 @@ function wavenumber_creation(wavenumbers_ansatz::Matrix{<:Real}, wavenumbers_tes
     return wavenumber_frequency_matrix_ansatz, wavenumber_frequency_matrix_test
 end
 
-function combine_wavenumber_with_all_nodes(matrix_1, matrix_2)
-    n_wavenumbers = size(matrix_1, 1)
-    n_nodes = size(matrix_2, 1)
 
-    result = Array{Tuple{Vector{eltype(wavenumbers)}, Vector{eltype(nodes)}}}(undef, n_wavenumbers * n_nodes)
 
-    for k_iter in 1:n_wavenumbers
-        wavenumber = wavenumbers[k_iter, :]  # Current wavenumber row
-        for node_iter in 1:n_nodes
-          result[(k_iter-1)*n_nodes + node_iter] = (wavenumber, nodes[node_iter, :])
-        end
-    end
+function combine_wavenumber_with_all_nodes(matrix_1::Matrix{T}, matrix_2::Matrix{U}) where {T,U}
+    # Create an iterator of all combinations
+    combinations = product(eachrow(matrix_1), eachrow(matrix_2))
+
+    # Convert the iterator to an array of tuples
+    result = collect(combinations)
 
     return result
 end
