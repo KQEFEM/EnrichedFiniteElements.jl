@@ -2,7 +2,7 @@ module BasisFunctions
 
 export all
 
-function phi(x::Real, y::Real,z::Real=0.0)
+function phi(x::Real, y::Real, z::Real = 0.0)
     """
     Defines the Phi basis functions for a linear triangle.
 
@@ -16,7 +16,7 @@ function phi(x::Real, y::Real,z::Real=0.0)
     return [1 - x - y; x; y]
 end
 
-function p_matrix(x::Real, y::Real,z::Real=0)
+function p_matrix(x::Real, y::Real, z::Real = 0)
     """
     Defines the P matrix (Phi * Phi').
 
@@ -32,7 +32,12 @@ function p_matrix(x::Real, y::Real,z::Real=0)
     return phi_val * phi_val'  # Use * for matrix multiplication
 end
 
-function grads_matrix(grad_matrix::AbstractMatrix{<:Real}, x::Real=0, y::Real=0, z::Real=0)
+function grads_matrix(
+    grad_matrix::AbstractMatrix{<:Real},
+    x::Real = 0,
+    y::Real = 0,
+    z::Real = 0,
+)
     """
     Defines the grads matrix (3x3) from a given matrix.
 
@@ -66,7 +71,7 @@ function enrich_space(x::Real, y::Real, t::Real, A::Real, B::Real, C::Real)
     return exp(1im * (A * x + B * y + C))  # 1im represents the imaginary unit
 end
 
-function e_time_mass(x::Real,y::Real,t::Real, w::Float64, dt::Real, t0::Real, ww::Float64)
+function e_time_mass(x::Real, y::Real, t::Real, w::Float64, dt::Real, t0::Real, ww::Float64)
     """
     Defines the time enrichment function for the mass term.
 
@@ -111,4 +116,4 @@ function e_time_test(x::Real, y::Real, t::Real, ww::Vector{Float64})
     return exp(-1im * ww * t)
 end
 
-end 
+end

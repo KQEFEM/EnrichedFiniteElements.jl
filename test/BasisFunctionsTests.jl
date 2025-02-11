@@ -54,10 +54,10 @@ using .BasisFunctions  # Assuming BasisFunctions.jl is in the same directory or 
         t0 = 0.0
         ww = 2.0
 
-        e_mass = BasisFunctions.e_time_mass(x,y,t, w, dt, t0, ww)
+        e_mass = BasisFunctions.e_time_mass(x, y, t, w, dt, t0, ww)
         @test isa(e_mass, Complex)
 
-        e_ansatz = BasisFunctions.enrichment_time(x,y,t, w)
+        e_ansatz = BasisFunctions.enrichment_time(x, y, t, w)
         @test isa(e_ansatz, Complex)
 
         # e_test = BasisFunctions.e_time_test(x,y,t, ww)
@@ -65,4 +65,4 @@ using .BasisFunctions  # Assuming BasisFunctions.jl is in the same directory or 
 
     end
 end
-end 
+end

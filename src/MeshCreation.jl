@@ -15,12 +15,16 @@ struct MeshData
     boundary_edges::Matrix{Int}   # Edge connectivity (bx2 matrix)
 end
 
-function rectangle_domain(domain, mesh_size::Real = 0.5, filename::String="./mesh/rectangle_mesh.msh")
-     # Create the directory if it doesn't exist
-     dir_path = dirname(filename)  # Get the directory part of the filename
-     if !isdir(dir_path)
-         mkpath(dir_path)  # Create the directory and any necessary parent directories
-     end
+function rectangle_domain(
+    domain,
+    mesh_size::Real = 0.5,
+    filename::String = "./mesh/rectangle_mesh.msh",
+)
+    # Create the directory if it doesn't exist
+    dir_path = dirname(filename)  # Get the directory part of the filename
+    if !isdir(dir_path)
+        mkpath(dir_path)  # Create the directory and any necessary parent directories
+    end
 
     (x_min, x_max), (y_min, y_max) = domain
 
@@ -91,12 +95,19 @@ function rectangle_domain(domain, mesh_size::Real = 0.5, filename::String="./mes
     # Finalize Gmsh
     Gmsh.finalize()
 
-    return MeshData(nodes, elem_nodes, elem_types, connectivity, boundary_nodes, boundary_edges)
+    return MeshData(
+        nodes,
+        elem_nodes,
+        elem_types,
+        connectivity,
+        boundary_nodes,
+        boundary_edges,
+    )
 end
 
 
 
-function extract_mesh_info(filename::String="rectangle_mesh.msh")
+function extract_mesh_info(filename::String = "rectangle_mesh.msh")
     Gmsh.initialize()
 
     # Read the generated mesh file (assumed to be "rectangle_mesh.msh")
@@ -116,7 +127,7 @@ function extract_mesh_info(filename::String="rectangle_mesh.msh")
             push!(triangles, reshape(connectivity, 3, :)')
         end
     end
-        # Get boundary edges (Corrected)
+    # Get boundary edges (Corrected)
     boundary_entities = gmsh.model.mesh.getBoundary([2], true, false, true) # Get boundary edges of the surface
     boundary_edges = Matrix{Int}(undef, length(boundary_entities), 2)
     boundary_nodes_indices = unique(Int[])
@@ -139,32 +150,32 @@ function plot_mesh(mesh)
     connectivity = mesh.connectivity
     boundary_index = mesh.boundary_idx
     boundary_edges = mesh.boundary_edges
-    
+
     # Create a figure and an axis *together*
     fig = Figure()
     ax = Axis(fig[1, 1], aspect = DataAspect()) #Aspect ratio is important
 
     # Plot the elements (triangles)
     n_triangles = length(connectivity) ÷ 3 #Number of triangles. Each triangle has 3 nodes
-    for i in 1:n_triangles
-        triangle_nodes = nodes[connectivity[i,:],:]
+    for i = 1:n_triangles
+        triangle_nodes = nodes[connectivity[i, :], :]
         # triangle_nodes = @view connectivity[(i-1)*3+1:i*3] #Get the 3 nodes for the triangle
-        x_vals = triangle_nodes[:,1] #Correct indexing
+        x_vals = triangle_nodes[:, 1] #Correct indexing
         y_vals = triangle_nodes[:, 2] #Correct indexing
-        lines!(ax, [x_vals..., x_vals[1]], [y_vals..., y_vals[1]], color=:black) # Plot into the axis
+        lines!(ax, [x_vals..., x_vals[1]], [y_vals..., y_vals[1]], color = :black) # Plot into the axis
     end
 
     # Plot the boundary edges (highlighted) - Corrected
     for edge in eachrow(boundary_edges)
         x_vals = nodes[edge, 1]
         y_vals = nodes[edge, 2]
-        lines!(ax, x_vals, y_vals, color=:red, linewidth=2, label = "Boundary Edges") # Plot the boundary edges
+        lines!(ax, x_vals, y_vals, color = :red, linewidth = 2, label = "Boundary Edges") # Plot the boundary edges
     end
 
 
-# Legend(fig[1,2], ax) #Add legend
+    # Legend(fig[1,2], ax) #Add legend
 
     return fig #Display the figure
-end 
+end
 
 end  # module MeshCreation

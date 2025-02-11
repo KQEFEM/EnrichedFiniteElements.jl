@@ -17,4 +17,4 @@ boundary_edges = mesh.boundary_edges
 
 f = mesh_create.plot_mesh(mesh)
 
-wavenumbers = [0,0,0; 1,0,1;1,1,1]
+wavenumbers = [0, 0, 0; 1, 0, 1; 1, 1, 1]
