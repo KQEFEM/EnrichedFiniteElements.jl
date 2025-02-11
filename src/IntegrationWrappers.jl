@@ -28,6 +28,7 @@ function grads_wrapper(v,f,grad_matrix_input::AbstractMatrix{<:Real})
 
     x = v[1]
     y = v[2]
+    
     z = v[3]
     grad_matrix = f(grad_matrix_input, x, y, z)  # Pass the matrix AND x, y, z
 
