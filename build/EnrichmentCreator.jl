@@ -78,26 +78,26 @@ function wavenumber_creation(
     return wavenumber_frequency_matrix_ansatz, wavenumber_frequency_matrix_test
 end
 
- """
-    Creates a matrix of all possible combinations of rows from two input matrices.
+"""
+   Creates a matrix of all possible combinations of rows from two input matrices.
 
-    Args:
-        matrix_1: The first input matrix.
-        matrix_2: The second input matrix.
+   Args:
+       matrix_1: The first input matrix.
+       matrix_2: The second input matrix.
 
-    Returns:
-        A matrix containing all possible combinations of rows from the input matrices.
+   Returns:
+       A matrix containing all possible combinations of rows from the input matrices.
 
-    Raises:
-        ArgumentError: If either `matrix_1` or `matrix_2` is empty.
-    """
+   Raises:
+       ArgumentError: If either `matrix_1` or `matrix_2` is empty.
+   """
 #@docs EnrichedFiniteElements.EnrichmentCreator.combine_wavenumber_with_all_nodes
 
 function combine_wavenumber_with_all_nodes(
     matrix_1::Matrix{T},
     matrix_2::Matrix{U},
 ) where {T,U}
-   
+
     if isempty(matrix_1) || isempty(matrix_2)
         throw(ArgumentError("Both input matrices must have at least one row."))
     end

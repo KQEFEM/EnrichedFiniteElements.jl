@@ -78,26 +78,26 @@ function wavenumber_creation(
     return wavenumber_frequency_matrix_ansatz, wavenumber_frequency_matrix_test
 end
 
- """
-    Creates a matrix of all possible combinations of rows from two input matrices.
+"""
+   Creates a matrix of all possible combinations of rows from two input matrices.
 
-    Args:
-        matrix_1: The first input matrix.
-        matrix_2: The second input matrix.
+   Args:
+       matrix_1: The first input matrix.
+       matrix_2: The second input matrix.
 
-    Returns:
-        A matrix containing all possible combinations of rows from the input matrices.
+   Returns:
+       A matrix containing all possible combinations of rows from the input matrices.
 
-    Raises:
-        ArgumentError: If either `matrix_1` or `matrix_2` is empty.
-    """
+   Raises:
+       ArgumentError: If either `matrix_1` or `matrix_2` is empty.
+   """
 #@docs EnrichedFiniteElements.EnrichmentCreator.combine_wavenumber_with_all_nodes
 
 function combine_wavenumber_with_all_nodes(
     matrix_1::Matrix{T},
     matrix_2::Matrix{U},
 ) where {T,U}
-   
+
     if isempty(matrix_1) || isempty(matrix_2)
         throw(ArgumentError("Both input matrices must have at least one row."))
     end
@@ -107,8 +107,22 @@ function combine_wavenumber_with_all_nodes(
 
     # Convert the iterator to an array of tuples
     result = collect(combinations)
+    result = reshape(result, :, 1)
 
     return result
+end
+""" 
+Creates the pairs of indices for a connectivity matrix for test and ansatz
+"""
+function generate_pairs(vector_1::AbstractVector{T}, vector_2::AbstractVector{T}) where {T}
+    if isempty(vector_1) || isempty(vector_2)
+        throw(ArgumentError("The input vectors must not be empty."))
+    end
+
+    # Use broadcasting to generate all pairs
+    pairs = [(x, y) for x in vector_1, y in vector_2]
+    pairs = reshape(pairs, :, 1)
+    return pairs
 end
 
 end

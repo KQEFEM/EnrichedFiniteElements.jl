@@ -1,18 +1,18 @@
-function combine_wavenumber_with_all_nodes(wavenumbers, nodes)
-    n_wavenumbers = size(wavenumbers, 1)
-    n_nodes = size(nodes, 1)
+using IterTools
 
-    result = Array{Tuple{Vector{eltype(wavenumbers)},Vector{eltype(nodes)}}}(
-        undef,
-        n_wavenumbers * n_nodes,
-    )
-
-    for k_iter = 1:n_wavenumbers
-        wavenumber = wavenumbers[k_iter, :]  # Current wavenumber row
-        for node_iter = 1:n_nodes
-            result[(k_iter-1)*n_nodes+node_iter] = (wavenumber, nodes[node_iter, :])
-        end
+function combine_wavenumber_with_all_nodes(
+    matrix_1::Matrix{T},
+    matrix_2::Matrix{U},
+) where {T,U}
+    if isempty(matrix_1) || isempty(matrix_2)
+        throw(ArgumentError("Both input matrices must have at least one row."))
     end
+
+    # Create an iterator of all combinations of rows
+    combinations = product(eachrow(matrix_1), eachrow(matrix_2))
+
+    # Convert the iterator to an array of tuples
+    result = collect(combinations)
 
     return result
 end
@@ -125,7 +125,9 @@ println(wavenumber_frequency_matrix_test)
 a = [1.1 2.3 3; 1 1.1 2; 1.1 2.3 3; 2.3 3 1]
 unique(a, dims = 1)
 
+using Revise
 using EnrichedFiniteElements
+
 
 const wave_func = EnrichedFiniteElements.EnrichmentCreator
 wave_func.create_wavenumbers(1, 1)
@@ -134,15 +136,73 @@ wave_func.create_wavenumbers(1, 1)
 matrix_1 = rand(10, 3)  # Example 10x3 matrix
 matrix_2 = rand(5, 2)   # Example 5x2 matrix
 
-result = combine_wavenumber_with_all_nodes(matrix_1, matrix_2)
+result = wave_func.combine_wavenumber_with_all_nodes(matrix_1, matrix_2)
 
 # This will be for the looping
+
+domain = ((0, 1), (0, 1))
+num_nodes = 4
+const mesh_create = EnrichedFiniteElements.MeshCreation
+
+# Create the mesh
+mesh = mesh_create.rectangle_domain(domain)
+
+nodes = mesh.nodes
+connectivity = mesh.connectivity
+boundary_index = mesh.boundary_idx
+boundary_edges = mesh.boundary_edges
 nodes_idx = collect(1:size(nodes, 1))
-wavenumber_idx_ansatz = collect(1:size(matrix_1, 1))
+wavenumber_idx_ansatz = [1 2 3 4 5 6 7]#reshape(collect(1:size(matrix_1, 1)),(1,10))
 wavenumber_idx_test = wavenumber_idx_ansatz
 result_wavenumber_idx =
-    combine_wavenumber_with_all_nodes(wavenumber_idx_ansatz, wavenumber_idx_test)
+    wave_func.combine_wavenumber_with_all_nodes(wavenumber_idx_ansatz, wavenumber_idx_test)
 
 #! This can be used to vectorise the computation as we just loop through this list
 wavenumber_connect_idx =
-    combine_wavenumber_with_all_nodes(result_wavenumber_idx, connectivity)
+    a = wave_func.combine_wavenumber_with_all_nodes(result_wavenumber_idx, connectivity)
+
+
+wavenumber_idx_ansatz = reshape(wavenumber_idx_ansatz, 1, :)
+
+#! This is the code to use for the matrix creation
+using Revise
+using EnrichedFiniteElements
+domain = ((0, 1), (0, 1))
+num_nodes = 4
+const mesh_create = EnrichedFiniteElements.MeshCreation
+const wave_func = EnrichedFiniteElements.EnrichmentCreator
+
+# Create the mesh
+mesh = mesh_create.rectangle_domain(domain)
+
+nodes = mesh.nodes
+connectivity = mesh.connectivity
+boundary_index = mesh.boundary_idx
+boundary_edges = mesh.boundary_edges
+
+vector = [1, 2, 3, 4, 5, 6, 7]
+vector_2 = [10, 20, 30, 40, 50, 60, 70]
+vector = [1, 2, 3]
+vector_2 = [60, 70]
+all_pairs = wave_func.generate_pairs(vector, vector_2)
+println(all_pairs)
+result = wave_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)
+
+
+
+
+
+
+domain = ((0, 1), (0, 1))
+num_nodes = 2
+const mesh_create = EnrichedFiniteElements.MeshCreation
+
+# Create the mesh
+mesh = mesh_create.rectangle_domain(domain)
+connectivity = [1 2 3; 4 5 6]  # 2x3 matrix with sequential values
+vector = [1, 2, 3]
+vector_2 = [60, 70]
+
+all_pairs = wave_func.generate_pairs(vector, vector_2)
+println(all_pairs)
+result = wave_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)

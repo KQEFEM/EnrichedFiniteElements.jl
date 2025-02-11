@@ -1,5 +1,8 @@
 module EnrichedFiniteElements
+
 export generate_mesh, plot_mesh  # Explicitly export functions
+
+using JuliaFormatter
 
 include("BasisFunctions.jl")  # Include BasisFunctions FIRST
 using .BasisFunctions       # Use BasisFunctions
