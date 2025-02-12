@@ -28,7 +28,7 @@ function p_matrix(x::Real, y::Real, z::Real = 0)
         A 3x3 matrix.
     """
     phi_val = phi(x, y)
-    println(phi_val)
+    # println(phi_val)
     return phi_val * phi_val'  # Use * for matrix multiplication
 end
 
