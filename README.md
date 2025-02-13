@@ -24,4 +24,4 @@ using Pkg
 Pkg.add(url="https://github.com/KQEFEM/EnrichedFiniteElements.jl")
 ```
 ## Note
-The Docker container is only tested on Apple Silicon. 
+The Docker container is only tested on Apple Silicon and WSL (Although painfully slow to buuld). 
