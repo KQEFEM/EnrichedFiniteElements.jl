@@ -22,3 +22,6 @@ To install `EnrichedFiniteElements.jl`, run the following in the Julia REPL:
 ```julia
 using Pkg
 Pkg.add(url="https://github.com/KQEFEM/EnrichedFiniteElements.jl")
+```
+## Note
+The Docker container is only tested on Apple Silicon. 
