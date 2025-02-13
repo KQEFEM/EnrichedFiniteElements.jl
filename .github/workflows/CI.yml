@@ -96,9 +96,9 @@ jobs:
         with:
           version: "1"
       - name: Install JuliaFormatter
-        shell: julia -e 'using Pkg; Pkg.add("JuliaFormatter")'
+        run: julia -e 'using Pkg; Pkg.add("JuliaFormatter")'
       - name: Format code
-        shell: julia -e 'using JuliaFormatter; format(".")'
+        run: julia -e 'using JuliaFormatter; format(".")'
       - name: Configure Git
         run: |
           git config --local user.name "GitHub Actions Bot"

@@ -103,7 +103,6 @@ end
 @testset "Connectivity Creation" begin
     # Correct the initialization of 'connectivity' with random integers between 1 and 10
     connectivity = [1 2 3; 4 5 6]  # 2x3 matrix with sequential values
-    println(connectivity)
 
     # Define the vectors
     vector = [1, 2, 3]
@@ -115,12 +114,10 @@ end
     # Create the expected Matrix of Tuples by constructing it directly
     test_data_matrix = Matrix{Tuple{Int64,Int64}}(test_data)
 
-    # Assuming 'wave_func.generate_pairs' is the function you're testing
-    all_pairs = wave_func.generate_pairs(vector, vector_2)
-    println(all_pairs)
+    all_pairs = wavenumber_func.generate_pairs(vector, vector_2)
 
     @test all_pairs == test_data
-    result = wave_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)
+    result = wavenumber_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)
 
     test_data = [
         ([(1, 60)], [1, 2, 3]); ([(2, 60)], [1, 2, 3]); ([(3, 60)], [1, 2, 3]); ([(1, 70)], [1, 2, 3]); ([(2, 70)], [1, 2, 3]); ([(3, 70)], [1, 2, 3]); ([(1, 60)], [4, 5, 6]); ([(2, 60)], [4, 5, 6]); ([(3, 60)], [4, 5, 6]); ([(1, 70)], [4, 5, 6]); ([(2, 70)], [4, 5, 6]); ([(3, 70)], [4, 5, 6]);;
