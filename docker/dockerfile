@@ -16,11 +16,18 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && apt-get clean
 
-# Download and install the latest stable Julia for ARM64 (Apple Silicon)
-RUN JULIA_LATEST=$(wget -qO- https://julialang.org/downloads/ | grep -oP 'https://julialang-s3.julialang.org/bin/linux/aarch64/[^"]+' | head -1) \
-    && wget -q ${JULIA_LATEST} -O julia.tar.gz \
-    && tar -xzf julia.tar.gz -C /usr/local --strip-components=1 \
-    && rm julia.tar.gz
+# Determine architecture and download appropriate Julia
+ARG TARGETARCH
+RUN case "$TARGETARCH" in \
+    "arm64" ) JULIA_ARCH="aarch64"; ;; \
+    "amd64" | "x86_64") JULIA_ARCH="x64"; ;; \
+    *) echo "Unsupported architecture: $TARGETARCH. Defaulting to x64 (amd64)."; JULIA_ARCH="x64"; ;; \
+  esac \
+  && JULIA_LATEST_URL=$(wget -qO- https://julialang.org/downloads/ | grep -oP "https://julialang-s3.julialang.org/bin/linux/${JULIA_ARCH}/[^'\" ]+") \
+  && JULIA_URL=$(echo "$JULIA_LATEST_URL" | head -n 1) \
+  && wget -q "$JULIA_URL" -O julia.tar.gz \
+  && tar -xzf julia.tar.gz -C /usr/local --strip-components=1 \
+  && rm julia.tar.gz
 
 # Create a non-root user for running the container
 RUN useradd -m -s /bin/bash myuser
@@ -32,7 +39,7 @@ WORKDIR /opt/app
 # Copy the Julia project files
 COPY . /opt/app/
 
-# Install Julia dependencies
+# Install Julia dependencies - moved outside of user context for potential permission issues
 RUN julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
 
 # Set the default command to start Julia REPL
