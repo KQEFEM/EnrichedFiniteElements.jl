@@ -6,6 +6,12 @@ import ..IntegrationWrappers as help
 
 export all
 
+"""
+upper_bounds & lower_bounds: [dx,dy,dt]
+omega: [w,ww]
+K: [kx - kkx, ky - kky]
+"""
+
 function pDtq(
     upper_bounds::Vector{Float64},
     lower_bounds::Vector{Float64},
