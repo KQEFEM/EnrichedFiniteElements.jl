@@ -34,17 +34,27 @@ end
 
     # Correct way to create the expected array of tuples:
     expected_wavenumbers =
-        [(-1, -1), (0, -1), (1, -1), (-1, 0), (0, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
-    expected_wavenumbers = reshape(expected_wavenumbers, :, 1) # Reshape directly (no collect needed)
-
+    [
+        -1  0;
+        -1  1;
+         0  0;
+        -1 -1;
+         1  1;
+        -1  0;
+        -1  1;
+         0  1;
+         0  1
+    ]
+    # expected_wavenumbers = reshape(expected_wavenumbers, :, 1) # Reshape directly (no collect needed)
     actual_wavenumbers = wavenumber_func.create_wavenumbers(x_enrichments, y_enrichments)
+
     @test actual_wavenumbers == expected_wavenumbers
 
     # Test case 2: Test with zero enrichments
     x_enrichments = 0
     y_enrichments = 0
-    expected_wavenumbers = [(0, 0)]
-    expected_wavenumbers = reshape(expected_wavenumbers, :, 1)  # Reshape directly
+    expected_wavenumbers = [0 0]
+    # expected_wavenumbers = reshape(expected_wavenumbers, :, 1)  # Reshape directly
     actual_wavenumbers = wavenumber_func.create_wavenumbers(x_enrichments, y_enrichments)
     @test actual_wavenumbers == expected_wavenumbers
 end
