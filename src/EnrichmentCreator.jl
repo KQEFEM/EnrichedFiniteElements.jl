@@ -19,7 +19,7 @@ function create_wavenumbers(x_enrichments::Real, y_enrichments::Real)
     wavenumbers = collect(
         Iterators.product(-x_enrichments:x_enrichments, -y_enrichments:y_enrichments),
     )
-    return reshape(wavenumbers, :, 1)
+    return Matrix(reshape(reinterpret(Int64, wavenumbers), :, 2))
 end
 
 """
