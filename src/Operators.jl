@@ -34,7 +34,12 @@ function pDtq(
         hat_ansatz = help.hat_wrapper([(x + 1) / 2, (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
         hat_test = help.hat_wrapper([(x + 1) / 2, (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
 
-        return space_enrichment * time_enrichment * hat_ansatz * (omega[2] * hat_test')  # Multiply the RESULTS
+        return 1 / 4 *
+               (1 - x) *
+               space_enrichment *
+               time_enrichment *
+               hat_ansatz *
+               (omega[2] * hat_test')  # Multiply the RESULTS
     end
     integral_result = hcubature(integrand, lower_bounds, upper_bounds) # Use integrand
     return integral_result
@@ -75,7 +80,9 @@ function v_nabla_q(
             grads_matrix,
         )
 
-        return (hat_ansatz .* grads - 1im * hat_ansatz * hat_test' * K) *
+        return 1 / 4 *
+               (1 - x) *
+               (hat_ansatz .* grads - 1im * hat_ansatz * hat_test' * K) *
                space_enrichment *
                time_enrichment
     end
@@ -116,7 +123,11 @@ function mass_jump(
         hat_ansatz = help.hat_wrapper([(x + 1) / 2, (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
         hat_test = help.hat_wrapper([(x + 1) / 2, (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
 
-        return (hat_ansatz * hat_test') * space_enrichment * time_enrichment
+        return 1 / 4 *
+               (1 - x) *
+               (hat_ansatz * hat_test') *
+               space_enrichment *
+               time_enrichment
     end
     integral_result = hcubature(integrand, lower_bounds, upper_bounds) # Use integrand
     return integral_result
@@ -127,10 +138,10 @@ end
 #         x = v[1]
 #         y = v[2]
 #         z = v[3]
-#         space_enrichment = help.space_enrichment_wrapper([x,y,z], basis.enrich_space, A_val, B_val, C_val) # Pass vector, call enrich_space
-#         time_enrichment = help.mass_jump_wrapper([x,y,z],basis.e_time_mass, omega[1], dt, t0, omega[2])
-#         hat_ansatz = help.hat_wrapper([x,y,z], basis.phi) # Pass vector, call hat_function
-#         hat_test = help.hat_wrapper([x,y,z], basis.phi) # Pass vector, call hat_function
+#         space_enrichment = help.space_enrichment_wrapper([(x + 1)/2, (y+1)/2, z], basis.enrich_space, A_val, B_val, C_val) # Pass vector, call enrich_space
+#         time_enrichment = help.mass_jump_wrapper([(x + 1)/2, (y+1)/2, z],basis.e_time_mass, omega[1], dt, t0, omega[2])
+#         hat_ansatz = help.hat_wrapper([(x + 1)/2, (y+1)/2, z], basis.phi) # Pass vector, call hat_function
+#         hat_test = help.hat_wrapper([(x + 1)/2, (y+1)/2, z], basis.phi) # Pass vector, call hat_function
 
 #         return (hat_ansatz *  hat_test') * space_enrichment * time_enrichment
 #     end
