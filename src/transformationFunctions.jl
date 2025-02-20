@@ -1,4 +1,4 @@
-module transformationFunctions 
+module transformationFunctions
 using PolygonOps
 
 """
@@ -25,8 +25,12 @@ The function is designed to work with triangle nodes represented as a matrix whe
 - It is crucial to understand the role of `connect_triangle` within your specific application to ensure correct usage of this function.
 """
 function correct_triangle_orientation!(triangle_nodes, connect_triangle)
-    cross_product = (triangle_nodes[2,1] - triangle_nodes[1,1]) * (triangle_nodes[3,2] - triangle_nodes[1,2]) - (triangle_nodes[2,2] - triangle_nodes[1,2]) * (triangle_nodes[3,1] - triangle_nodes[1,1])
-    
+    cross_product =
+        (triangle_nodes[2, 1] - triangle_nodes[1, 1]) *
+        (triangle_nodes[3, 2] - triangle_nodes[1, 2]) -
+        (triangle_nodes[2, 2] - triangle_nodes[1, 2]) *
+        (triangle_nodes[3, 1] - triangle_nodes[1, 1])
+
     if cross_product < 0  # Ensures all of the normals point in the correct direction
         ABC = triangle_nodes[[1, 3, 2], :]
         connect_temp = connect_triangle[[1, 3, 2]] # Assuming connect_triangle is a matrix or vector that can be indexed like this
@@ -42,20 +46,20 @@ function Gradients_Larson(x, y)
     if length(x) != 3 || length(y) != 3
         error("x and y must have exactly 3 elements (triangle vertices).")
     end
-    
+
     # Compute the area of the triangle using the shoelace formula
-    tri_area = 0.5 * abs(x[1]*(y[2]-y[3]) + x[2]*(y[3]-y[1]) + x[3]*(y[1]-y[2]))
-    
+    tri_area = 0.5 * abs(x[1] * (y[2] - y[3]) + x[2] * (y[3] - y[1]) + x[3] * (y[1] - y[2]))
+
     # Check if the area is zero (degenerate triangle)
     if tri_area == 0
         error("The triangle area is zero (degenerate triangle).")
     end
-    
+
     # Compute gradients b and c
-    b = [y[2]-y[3]; y[3]-y[1]; y[1]-y[2]] / (2 * tri_area)
-    c = [x[3]-x[2]; x[1]-x[3]; x[2]-x[1]] / (2 * tri_area)
-    
+    b = [y[2] - y[3]; y[3] - y[1]; y[1] - y[2]] / (2 * tri_area)
+    c = [x[3] - x[2]; x[1] - x[3]; x[2] - x[1]] / (2 * tri_area)
+
     return tri_area, b, c
 end
 
-end 
+end
