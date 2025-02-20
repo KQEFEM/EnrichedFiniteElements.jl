@@ -16,11 +16,13 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && apt-get clean
 
-# Download and install the latest stable Julia for ARM64 (Apple Silicon)
-RUN JULIA_LATEST=$(wget -qO- https://julialang.org/downloads/ | grep -oP 'https://julialang-s3.julialang.org/bin/linux/aarch64/[^"]+' | head -1) \
-    && wget -q ${JULIA_LATEST} -O julia.tar.gz \
-    && tar -xzf julia.tar.gz -C /usr/local --strip-components=1 \
-    && rm julia.tar.gz
+# Check if Julia is installed; if not, install the latest stable version
+RUN if ! command -v julia &> /dev/null; then \
+    JULIA_LATEST=$(wget -qO- https://julialang.org/downloads/ | grep -oP 'https://julialang-s3.julialang.org/bin/linux/aarch64/[^"]+' | head -1) && \
+    wget -q ${JULIA_LATEST} -O julia.tar.gz && \
+    tar -xzf julia.tar.gz -C /usr/local --strip-components=1 && \
+    rm julia.tar.gz; \
+    fi
 
 # Create a non-root user for running the container
 RUN useradd -m -s /bin/bash myuser
