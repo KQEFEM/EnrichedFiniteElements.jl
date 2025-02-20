@@ -41,6 +41,30 @@ const transformations = EnrichedFiniteElements.transformationFunctions
         @test updated_connect_triangle == connect_triangle_correct
     end
 
-end
 
-end # module transformationFunctionsTests
+end 
+
+@testset "Gradients_Larson Tests" begin
+    @testset "Test 1: Valid triangle" begin # Added 'begin' here
+        x1 = [0.0, 1.0, 0.0]
+        y1 = [0.0, 0.0, 1.0]
+        area1, b1, c1 = transformations.Gradients_Larson(x1, y1) # Corrected function call
+     
+        @test area1 ≈ 0.5
+        @test b1 ≈ [-1.0, 1.0, 0.0]
+        @test c1 ≈ [-1.0, 0.0, 1.0]
+    end      
+   
+    @testset "Test 2: Another valid triangle" begin # Added 'begin' here
+        x4 = [0.0, 2.0, 0.0]
+        y4 = [0.0, 0.0, 2.0]
+        area4, b4, c4 = transformations.Gradients_Larson(x4, y4) # Corrected function call
+        println(area4)
+        println(b4)
+        println(c4)
+        @test area4 ≈ 2.0
+        @test b4 ≈ [-0.5, 0.5, 0.0]
+        @test c4 ≈ [-0.5, 0.0, 0.5]
+    end 
+end 
+end 

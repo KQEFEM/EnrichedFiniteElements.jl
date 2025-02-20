@@ -33,7 +33,7 @@ idx_connectivity = collect(1:size(connectivity,1))
 result = wave_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)
 
 #! Matrix Creation 
-
+using Revise
 using SparseArrays
 const Transformations = EnrichedFiniteElements.transformationFunctions
 
@@ -55,6 +55,18 @@ for ii in result
     println(triangle_nodes)
 
     triangle_nodes, triangle_connectivity = Transformations.correct_triangle_orientation!(triangle_nodes, triangle_connectivity)
+
+    kx_kkx = wave_ansatz_loc[1] - wave_test_loc[1]
+    ky_kky = wave_ansatz_loc[2] - wave_test_loc[2]
+    A = kx_kkx*(triangle_nodes[2,1] - triangle_nodes[1,1]) + ky_kky*(triangle_nodes[2,2] - triangle_nodes[1,2])
+    B = kx_kkx*(triangle_nodes[3,1] - triangle_nodes[1,1]) + ky_kky*(triangle_nodes[3,2] - triangle_nodes[1,2])
+    C = kx_kkx*triangle_nodes[1,1] + ky_kky*triangle_nodes[1,2]
+
+    tri_area, ddx, ddy = Transformations.Gradients_Larson(triangle_nodes[:,1],triangle_nodes[:,2])
+    
+    
+    # grads_grads_dx = ddx*ddx.' ;
+    # grads_grads_dy = ddy*ddy.' ;
     println(triangle_nodes)
     break
 end 

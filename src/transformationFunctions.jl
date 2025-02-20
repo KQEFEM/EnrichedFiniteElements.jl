@@ -37,11 +37,24 @@ function correct_triangle_orientation!(triangle_nodes, connect_triangle)
 end
 
 
-
 function Gradients_Larson(x, y)
-    tri_area = polyarea(x, y)
+    # Ensure x and y are vectors of length 3 (triangle vertices)
+    if length(x) != 3 || length(y) != 3
+        error("x and y must have exactly 3 elements (triangle vertices).")
+    end
+    
+    # Compute the area of the triangle using the shoelace formula
+    tri_area = 0.5 * abs(x[1]*(y[2]-y[3]) + x[2]*(y[3]-y[1]) + x[3]*(y[1]-y[2]))
+    
+    # Check if the area is zero (degenerate triangle)
+    if tri_area == 0
+        error("The triangle area is zero (degenerate triangle).")
+    end
+    
+    # Compute gradients b and c
     b = [y[2]-y[3]; y[3]-y[1]; y[1]-y[2]] / (2 * tri_area)
     c = [x[3]-x[2]; x[1]-x[3]; x[2]-x[1]] / (2 * tri_area)
+    
     return tri_area, b, c
 end
 
