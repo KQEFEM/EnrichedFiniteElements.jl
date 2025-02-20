@@ -64,9 +64,17 @@ for ii in result
 
     tri_area, ddx, ddy = Transformations.Gradients_Larson(triangle_nodes[:,1],triangle_nodes[:,2])
     
-    
-    # grads_grads_dx = ddx*ddx.' ;
-    # grads_grads_dy = ddy*ddy.' ;
+    println(ddx)
+
+    grads_grads_dx = ddx*ddx' ;
+    grads_grads_dy = ddy*ddy' ;
+    println(grads_grads_dx)
     println(triangle_nodes)
+
+
+    
+
+
+
     break
 end 
