@@ -23,6 +23,6 @@ include("EnrichmentCreator.jl")
 using .EnrichmentCreator
 
 include("transformationFunctions.jl")
-using .transformationsFunctions
+using .transformationFunctions
 
 end  # module EnrichedFiniteElements
