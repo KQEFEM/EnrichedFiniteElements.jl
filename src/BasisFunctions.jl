@@ -85,7 +85,7 @@ function e_time_mass(x::Real, y::Real, t::Real, w::Float64, dt::Real, t0::Real, 
     Returns:
         A complex number.
     """
-    return exp(1im * w * dt) * exp(-1im * ww * (t - t0))
+    return exp(1im * w * dt) * exp(-1im * ww * (t - t0)) #! This is wrong - refer to thesis
 end
 
 function enrichment_time(x::Real, y::Real, t::Real, w::Float64)
