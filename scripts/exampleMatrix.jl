@@ -237,3 +237,100 @@ matrix = [
 
 real(cell_sparse_zero_array[1] - matrix)
 diag(real(cell_sparse_zero_array[1] - matrix))
+
+
+############ MASS MATRIX ####################
+#! This is being used to debug the above 
+
+using Revise
+using LinearAlgebra  # Import the LinearAlgebra module
+using SparseArrays
+const Transformations = EnrichedFiniteElements.transformationFunctions
+const integrator = EnrichedFiniteElements.Operators
+cell_sparse_zero_array =
+    Array{SparseMatrixCSC{ComplexF64,Int64}}(undef, size(all_pairs, 1), size(all_pairs, 1)) # Explicitly specify ComplexF64
+n = size(nodes, 1)
+for i = 1:prod(size(cell_sparse_zero_array))
+    cell_sparse_zero_array[i] = spzeros(n, n) # Create nxn sparse matrix of zeros
+end
+
+mass_mat_loc = 0
+for ii in result
+    #? This is correct
+    # ii = result[1]
+
+    wave_ansatz_loc = wavenumbers_ansatz[ii[1][1][1], :]
+    wave_test_loc = wavenumbers_test[ii[1][1][2], :]
+
+
+    triangle_connectivity = ii[2]
+
+    triangle_nodes = nodes[ii[2], :]
+
+    triangle_nodes, triangle_connectivity =
+        Transformations.correct_triangle_orientation!(triangle_nodes, triangle_connectivity)
+
+    kx_kkx = wave_ansatz_loc[1] - wave_test_loc[1]
+    ky_kky = wave_ansatz_loc[2] - wave_test_loc[2]
+    A =
+        kx_kkx * (triangle_nodes[2, 1] - triangle_nodes[1, 1]) +
+        ky_kky * (triangle_nodes[2, 2] - triangle_nodes[1, 2])
+    B =
+        kx_kkx * (triangle_nodes[3, 1] - triangle_nodes[1, 1]) +
+        ky_kky * (triangle_nodes[3, 2] - triangle_nodes[1, 2])
+    C = kx_kkx * triangle_nodes[1, 1] + ky_kky * triangle_nodes[1, 2]
+
+    tri_area, ddx, ddy =
+        Transformations.Gradients_Larson(triangle_nodes[:, 1], triangle_nodes[:, 2])
+
+    # println(ddx)
+
+    grads_grads_dx = ddx * ddx'
+    # println(grads_grads_dx)
+    # println(size(grads_grads_dx))
+    grads_grads_dy = ddy * ddy'
+    # println(grads_grads_dx)
+    # println(triangle_nodes)
+
+
+    #! Integration stage now (this is incorrect or there is a wrong sign)
+
+    upper_bounds = [1.0, 1.0, 1.0]
+    lower_bounds = [-1.0, -1.0, 0.0]
+    omega = [0.0, 0.0]
+    dt = 0.1
+    t_jump = 0.0
+    t0 = 0.0
+
+    mass_loc, _ = integrator.mass_jump(
+        upper_bounds,
+        lower_bounds,
+        A,
+        B,
+        C,
+        omega,
+        t_jump,
+        dt,
+        t0,
+        tri_area,
+    )
+    # println(v_nabla_q_loc)
+    # println(cell_sparse_zero_array[1,2][triangle_connectivity,triangle_connectivity])
+    cell_sparse_zero_array[1, 1][triangle_connectivity, triangle_connectivity] =
+        cell_sparse_zero_array[1, 1][triangle_connectivity, triangle_connectivity] +
+        mass_loc
+
+    # upper_bounds::Vector{Float64},
+    # lower_bounds::Vector{Float64},
+    # A_val::Float64,
+    # B_val::Float64,
+    # C_val::Float64,
+    # omega::Vector{Float64},
+    # dt::Real,
+    # t0::Real,
+    # triangle_area::Float64
+
+end
+println(cell_sparse_zero_array[1, 1])
+real(cell_sparse_zero_array[1])
+real(diag(cell_sparse_zero_array[1]))
