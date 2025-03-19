@@ -71,7 +71,7 @@ function enrich_space(x::Real, y::Real, t::Real, A::Real, B::Real, C::Real)
     return exp(1im * (A * x + B * y + C))  # 1im represents the imaginary unit
 end
 
-function e_time_mass(x::Real, y::Real, t::Real, w::Float64, dt::Real, t0::Real, ww::Float64)
+function e_time_mass(x::Real, y::Real, t::Real,  w::Float64, t_jump::Real, dt::Real, t0::Real, ww::Float64)
     """
     Defines the time enrichment function for the mass term.
 
@@ -85,7 +85,7 @@ function e_time_mass(x::Real, y::Real, t::Real, w::Float64, dt::Real, t0::Real, 
     Returns:
         A complex number.
     """
-    return exp(1im * w * dt) * exp(-1im * ww * (t - t0)) #! This is wrong - refer to thesis
+    return exp(1im * w * dt) * exp(-1im * ww * (t_jump - t0)) 
 end
 
 function enrichment_time(x::Real, y::Real, t::Real, w::Float64)

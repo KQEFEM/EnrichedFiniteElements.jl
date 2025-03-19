@@ -185,9 +185,11 @@ for ii in result
     lower_bounds = [-1.0, -1.0, 0.0]
     omega = [0.0, 0.0]
     dt = 0.1
+    t_jump = 0.0
     t0 = 0.0
+    
     mass_loc, _ =
-        integrator.mass_jump(upper_bounds, lower_bounds, A, B, C, omega, dt, t0, tri_area)
+        integrator.mass_jump(upper_bounds, lower_bounds, A, B, C, omega, t_jump, dt, t0, tri_area)
     # println(v_nabla_q_loc)
     # println(cell_sparse_zero_array[1,2][triangle_connectivity,triangle_connectivity])
     cell_sparse_zero_array[1, 1][triangle_connectivity, triangle_connectivity] =
@@ -221,7 +223,7 @@ matrix = [
     0.0156 0 0 0 0.0127 0 0 0.0126 0.0094 0.0697 0.0096 0.0098
     0 0 0.0148 0 0 0.0122 0.0123 0 0.0095 0.0096 0.0682 0.0098
     0 0.0117 0 0 0.0107 0.0108 0 0 0 0.0098 0.0098 0.0528
-];
+]
 
 real(cell_sparse_zero_array[1] - matrix)
 diag(real(cell_sparse_zero_array[1] - matrix))
