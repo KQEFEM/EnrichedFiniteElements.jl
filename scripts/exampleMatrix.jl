@@ -187,9 +187,19 @@ for ii in result
     dt = 0.1
     t_jump = 0.0
     t0 = 0.0
-    
-    mass_loc, _ =
-        integrator.mass_jump(upper_bounds, lower_bounds, A, B, C, omega, t_jump, dt, t0, tri_area)
+
+    mass_loc, _ = integrator.mass_jump(
+        upper_bounds,
+        lower_bounds,
+        A,
+        B,
+        C,
+        omega,
+        t_jump,
+        dt,
+        t0,
+        tri_area,
+    )
     # println(v_nabla_q_loc)
     # println(cell_sparse_zero_array[1,2][triangle_connectivity,triangle_connectivity])
     cell_sparse_zero_array[1, 1][triangle_connectivity, triangle_connectivity] =

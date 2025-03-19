@@ -35,7 +35,7 @@ function grads_wrapper(v, f, grad_matrix_input::AbstractMatrix{<:Real})
     return grad_matrix
 end
 
-function mass_jump_wrapper(v, f, w::Real,t_jump::Real, dt::Real, t0::Real, ww::Real)
+function mass_jump_wrapper(v, f, w::Real, t_jump::Real, dt::Real, t0::Real, ww::Real)
     x = v[1]
     y = v[2]
     z = v[3]

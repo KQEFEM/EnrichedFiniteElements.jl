@@ -28,19 +28,20 @@ function pDtq(
         y = v[2]
         z = v[3]
         space_enrichment = help.space_enrichment_wrapper(
-            [(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z],
+            [(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z],
             basis.enrich_space,
             A_val,
             B_val,
             C_val,
         ) # Pass vector, call enrich_space
         time_enrichment = help.time_enrichment_wrapper(
-            [(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z],
+            [(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z],
             basis.enrichment_time,
             diff(omega)[1],
         ) # Pass vector, call enrichment_time
-        hat_ansatz = help.hat_wrapper([(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
-        hat_test = help.hat_wrapper([(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
+        hat_ansatz =
+            help.hat_wrapper([(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
+        hat_test = help.hat_wrapper([(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
 
         return 1 / 4 *
                (1 - x) *
@@ -70,21 +71,22 @@ function v_nabla_q(
         y = v[2]
         z = v[3]
         space_enrichment = help.space_enrichment_wrapper(
-            [(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z],
+            [(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z],
             basis.enrich_space,
             A_val,
             B_val,
             C_val,
         ) # Pass vector, call enrich_space
         time_enrichment = help.time_enrichment_wrapper(
-            [(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z],
+            [(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z],
             basis.enrichment_time,
             diff(omega)[1],
         ) # Pass vector, call enrichment_time
-        hat_ansatz = help.hat_wrapper([(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
-        hat_test = help.hat_wrapper([(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
+        hat_ansatz =
+            help.hat_wrapper([(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
+        hat_test = help.hat_wrapper([(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
         grads = help.grads_wrapper(
-            [(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z],
+            [(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z],
             basis.grads_matrix,
             grads_matrix,
         )
@@ -107,7 +109,6 @@ function mass_jump(
     C_val::Float64,
     omega::Vector{Float64},
     t_jump::Real, # THis will either be dt or t0 depending on the jump 
-
     dt::Real,
     t0::Real,
     triangle_area::Float64,
@@ -118,14 +119,14 @@ function mass_jump(
         y = v[2]
         z = v[3]
         space_enrichment = help.space_enrichment_wrapper(
-            [(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z],
+            [(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z],
             basis.enrich_space,
             A_val,
             B_val,
             C_val,
         ) # Pass vector, call enrich_space
         time_enrichment = help.mass_jump_wrapper(
-            [(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z],
+            [(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z],
             basis.e_time_mass,
             omega[1],
             t_jump,
@@ -133,8 +134,9 @@ function mass_jump(
             t0,
             omega[2],
         )
-        hat_ansatz = help.hat_wrapper([(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
-        hat_test = help.hat_wrapper([(x + 1) / 2, (1-x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
+        hat_ansatz =
+            help.hat_wrapper([(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
+        hat_test = help.hat_wrapper([(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
 
         return triangle_area * 1 / 4 *
                (1 - x) *
