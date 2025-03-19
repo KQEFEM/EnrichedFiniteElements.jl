@@ -37,7 +37,7 @@ end
 
 end
 
-function nodal_transformations(ii)
+function nodal_transformations(ii,nodes)
     """ Extracts the mesh values """
     triangle_connectivity = ii[2]
     triangle_nodes = nodes[ii[2], :]
@@ -48,7 +48,7 @@ function nodal_transformations(ii)
     return triangle_nodes, triangle_connectivity
 end
 
-function enrichment_transformations(ii)
+function enrichment_transformations(ii,wavenumbers_ansatz,wavenumbers_test,triangle_nodes)
     """ 
     This extracts the relavant variables for the enrichments and transformationFunctions
     """
@@ -73,9 +73,9 @@ function compute_sparse_mass_matrix(all_pairs, nodes, result, wavenumbers_ansatz
     for ii in result
         cell_idx = ii[1][1] # this grabs the tuple ( - , - )
 
-        triangle_nodes, triangle_connectivity = nodal_transformations(ii)
+        triangle_nodes, triangle_connectivity = nodal_transformations(ii,nodes)
         
-        kx_kkx, ky_kky, omega, A,B,C = enrichment_transformations(ii)
+        kx_kkx, ky_kky, omega, A,B,C = enrichment_transformations(ii,wavenumbers_ansatz,wavenumbers_test,triangle_nodes)
         
         tri_area, ddx, ddy = Transformations.Gradients_Larson(triangle_nodes[:, 1], triangle_nodes[:, 2])
         grads_grads_dx = ddx * ddx'
