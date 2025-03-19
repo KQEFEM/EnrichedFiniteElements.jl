@@ -37,22 +37,24 @@ end
 
 end
 
-function compute_sparse_mass_matrix(all_pairs, nodes, result, wavenumbers_ansatz, wavenumbers_test, integrator)
-    cell_sparse_zero_array = matrix_creation(all_pairs,nodes);
+function nodal_transformations(ii)
+    """ Extracts the mesh values """
+    triangle_connectivity = ii[2]
+    triangle_nodes = nodes[ii[2], :]
+    
+    triangle_nodes, triangle_connectivity = 
+        Transformations.correct_triangle_orientation!(triangle_nodes, triangle_connectivity)
+    
+    return triangle_nodes, triangle_connectivity
+end
 
-    for ii in result
-        cell_idx = ii[1][1] # this grabs the tuple ( - , - )
-
-        wave_ansatz_loc = wavenumbers_ansatz[ii[1][1][1], :]
-        wave_test_loc = wavenumbers_test[ii[1][1][2], :]
-        
-        triangle_connectivity = ii[2]
-        triangle_nodes = nodes[ii[2], :]
-        
-        triangle_nodes, triangle_connectivity = 
-            Transformations.correct_triangle_orientation!(triangle_nodes, triangle_connectivity)
-        
-        kx_kkx = wave_ansatz_loc[1] - wave_test_loc[1]
+function enrichment_transformations(ii)
+    """ 
+    This extracts the relavant variables for the enrichments and transformationFunctions
+    """
+    wave_ansatz_loc = wavenumbers_ansatz[ii[1][1][1], :]
+    wave_test_loc = wavenumbers_test[ii[1][1][2], :]
+    kx_kkx = wave_ansatz_loc[1] - wave_test_loc[1]
         ky_kky = wave_ansatz_loc[2] - wave_test_loc[2]
         omega = [wave_ansatz_loc[3],wave_test_loc[3]]
 
@@ -62,6 +64,18 @@ function compute_sparse_mass_matrix(all_pairs, nodes, result, wavenumbers_ansatz
         B = kx_kkx * (triangle_nodes[3, 1] - triangle_nodes[1, 1]) +
             ky_kky * (triangle_nodes[3, 2] - triangle_nodes[1, 2])
         C = kx_kkx * triangle_nodes[1, 1] + ky_kky * triangle_nodes[1, 2]
+        return kx_kkx, ky_kky, omega, A,B,C
+end
+
+function compute_sparse_mass_matrix(all_pairs, nodes, result, wavenumbers_ansatz, wavenumbers_test, integrator)
+    cell_sparse_zero_array = matrix_creation(all_pairs,nodes);
+
+    for ii in result
+        cell_idx = ii[1][1] # this grabs the tuple ( - , - )
+
+        triangle_nodes, triangle_connectivity = nodal_transformations(ii)
+        
+        kx_kkx, ky_kky, omega, A,B,C = enrichment_transformations(ii)
         
         tri_area, ddx, ddy = Transformations.Gradients_Larson(triangle_nodes[:, 1], triangle_nodes[:, 2])
         grads_grads_dx = ddx * ddx'
