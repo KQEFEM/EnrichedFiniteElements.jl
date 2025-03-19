@@ -70,6 +70,12 @@ function wavenumber_creation(
                 [wavenumbers_test[ii, 1], wavenumbers_test[ii, 2], freq_test]
         end
     end
+    # **Normalize Zero Values to Ensure -0.0 and 0.0 Are Treated as the Same**
+    function normalize_zeros(matrix)
+        return map(x -> iszero(x) ? 0.0 : x, matrix)
+    end
+    wavenumber_frequency_matrix_ansatz = normalize_zeros(wavenumber_frequency_matrix_ansatz)
+    wavenumber_frequency_matrix_test = normalize_zeros(wavenumber_frequency_matrix_test)
 
     wavenumber_frequency_matrix_ansatz =
         unique(wavenumber_frequency_matrix_ansatz, dims = 1)
