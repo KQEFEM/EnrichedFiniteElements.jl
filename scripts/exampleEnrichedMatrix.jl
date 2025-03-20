@@ -48,6 +48,6 @@ cell_sparse_zero_array_2 = matrix_comp.compute_sparse_mass_matrix(
     wavenumbers_test,
     integrator,
     dt,
-dt,
-   0.0,
+    dt,
+    0.0,
 )

@@ -106,7 +106,8 @@ function compute_sparse_mass_matrix(
             triangle_nodes,
         )
 
-        tri_area, ddx, ddy = transformations.Gradients_Larson(triangle_nodes[:, 1], triangle_nodes[:, 2])
+        tri_area, ddx, ddy =
+            transformations.Gradients_Larson(triangle_nodes[:, 1], triangle_nodes[:, 2])
         grads_grads_dx = ddx .^ 2
         grads_grads_dy = ddy .^ 2
 
@@ -126,7 +127,10 @@ function compute_sparse_mass_matrix(
             tri_area,
         )
 
-        cell_sparse_zero_array[cell_idx[1], cell_idx[2]][triangle_connectivity, triangle_connectivity] .+= mass_loc
+        cell_sparse_zero_array[cell_idx[1], cell_idx[2]][
+            triangle_connectivity,
+            triangle_connectivity,
+        ] .+= mass_loc
     end
 
     return cell_sparse_zero_array
