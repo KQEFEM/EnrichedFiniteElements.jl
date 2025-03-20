@@ -7,7 +7,6 @@ using EnrichedFiniteElements
 
 
 
-const Transformations = EnrichedFiniteElements.TransformationFunctions
 const integrator = EnrichedFiniteElements.Operators
 
 const mesh_create = EnrichedFiniteElements.MeshCreation

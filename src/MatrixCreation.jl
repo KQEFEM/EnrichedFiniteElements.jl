@@ -4,8 +4,11 @@ using SparseArrays
 using HCubature
 import ..BasisFunctions as basis
 import ..Operators as op
-import ..TransformationFunctions as Transformations
+# import ..TransformationFunctions as transformations
+using ..TransformationFunctions
+
 export all
+const transformations = TransformationFunctions
 const integrator = op
 
 function sparse_matrix_creation(all_pairs, nodes)
@@ -47,7 +50,7 @@ function nodal_transformations(ii, nodes)
     triangle_nodes = nodes[ii[2], :]
 
     triangle_nodes, triangle_connectivity =
-        Transformations.correct_triangle_orientation!(triangle_nodes, triangle_connectivity)
+        transformations.correct_triangle_orientation!(triangle_nodes, triangle_connectivity)
 
     return triangle_nodes, triangle_connectivity
 end
@@ -103,7 +106,7 @@ function compute_sparse_mass_matrix(
             triangle_nodes,
         )
 
-        tri_area, ddx, ddy = Transformations.Gradients_Larson(triangle_nodes[:, 1], triangle_nodes[:, 2])
+        tri_area, ddx, ddy = transformations.Gradients_Larson(triangle_nodes[:, 1], triangle_nodes[:, 2])
         grads_grads_dx = ddx .^ 2
         grads_grads_dy = ddy .^ 2
 
