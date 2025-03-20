@@ -1,14 +1,14 @@
 module MatrixCreation
+using SparseArrays
 
 using HCubature
 import ..BasisFunctions as basis
 import ..Operators as op
-import ..transformationFunctions as Transformations
-
-# const Transformations = .transformationFunctions
+import ..TransformationFunctions as Transformations
+export all
 const integrator = op
 
-function spares_matrix_creation(all_pairs, nodes)
+function sparse_matrix_creation(all_pairs, nodes)
     """
     Creates the sparse array needed fro the enriched matrix computations 
     """
@@ -59,7 +59,7 @@ function enrichment_transformations(
     triangle_nodes,
 )
     """ 
-    This extracts the relavant variables for the enrichments and transformationFunctions
+    This extracts the relavant variables for the enrichments and TransformationFunctions
     """
     wave_ansatz_loc = wavenumbers_ansatz[ii[1][1][1], :]
     wave_test_loc = wavenumbers_test[ii[1][1][2], :]
@@ -78,7 +78,7 @@ function enrichment_transformations(
     return kx_kkx, ky_kky, omega, A, B, C
 end
 
-function compute_sparse_mass_matrix(;
+function compute_sparse_mass_matrix(
     all_pairs,
     nodes,
     result,
@@ -89,7 +89,7 @@ function compute_sparse_mass_matrix(;
     t_jump = 0.0,
     t0 = 0.0,
 )
-    cell_sparse_zero_array = matrix_creation(all_pairs, nodes)
+    cell_sparse_zero_array = sparse_matrix_creation(all_pairs, nodes)
 
     for ii in result
         cell_idx = ii[1][1] # this grabs the tuple ( - , - )
@@ -103,17 +103,12 @@ function compute_sparse_mass_matrix(;
             triangle_nodes,
         )
 
-        tri_area, ddx, ddy =
-            Transformations.Gradients_Larson(triangle_nodes[:, 1], triangle_nodes[:, 2])
-        grads_grads_dx = ddx * ddx'
-        grads_grads_dy = ddy * ddy'
+        tri_area, ddx, ddy = Transformations.Gradients_Larson(triangle_nodes[:, 1], triangle_nodes[:, 2])
+        grads_grads_dx = ddx .^ 2
+        grads_grads_dy = ddy .^ 2
 
         upper_bounds = [1.0, 1.0, 1.0]
         lower_bounds = [-1.0, -1.0, 0.0]
-
-        #? dt = 0.1 #! This needs to be in the function input
-        #? t_jump = 0.0
-        #? t0 = 0.0
 
         mass_loc, _ = integrator.mass_jump(
             upper_bounds,
@@ -128,14 +123,12 @@ function compute_sparse_mass_matrix(;
             tri_area,
         )
 
-        cell_sparse_zero_array[cell_idx[1], cell_idx[2]][
-            triangle_connectivity,
-            triangle_connectivity,
-        ] .+= mass_loc
+        cell_sparse_zero_array[cell_idx[1], cell_idx[2]][triangle_connectivity, triangle_connectivity] .+= mass_loc
     end
 
     return cell_sparse_zero_array
 end
+
 end
 
 

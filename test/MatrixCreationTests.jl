@@ -7,7 +7,7 @@ using EnrichedFiniteElements
 
 
 
-const Transformations = EnrichedFiniteElements.transformationFunctions
+const Transformations = EnrichedFiniteElements.TransformationFunctions
 const integrator = EnrichedFiniteElements.Operators
 
 const mesh_create = EnrichedFiniteElements.MeshCreation
@@ -78,5 +78,25 @@ end
     dt,
        0.0,
     )
+
+    matrix = [
+    0.0312 0 0 0 0.0078 0 0 0.0078 0 0.0156 0 0
+    0 0.0234 0 0 0.0059 0.0059 0 0 0 0 0 0.0117
+    0 0 0.0295 0 0 0.0073 0.0074 0 0 0 0.0148 0
+    0 0 0 0.0245 0 0 0.0061 0.0061 0.0122 0 0 0
+    0.0078 0.0059 0 0 0.0371 0 0 0 0 0.0127 0 0.0107
+    0 0.0059 0.0073 0 0 0.0362 0 0 0 0 0.0122 0.0108
+    0 0 0.0074 0.0061 0 0 0.0368 0 0.0110 0 0.0123 0
+    0.0078 0 0 0.0061 0 0 0 0.0374 0.0109 0.0126 0 0
+    0 0 0 0.0122 0 0 0.0110 0.0109 0.0531 0.0094 0.0095 0
+    0.0156 0 0 0 0.0127 0 0 0.0126 0.0094 0.0697 0.0096 0.0098
+    0 0 0.0148 0 0 0.0122 0.0123 0 0.0095 0.0096 0.0682 0.0098
+    0 0.0117 0 0 0.0107 0.0108 0 0 0 0.0098 0.0098 0.0528
+    ]
+    println(cell_sparse_zero_array[1])
+    println(norm(diag(real(cell_sparse_zero_array[1] - matrix))))
+
+    @test isapprox(norm(real(cell_sparse_zero_array_2[1] - matrix)), 0.0, atol = 1e-3) # This is with the spatial step, dx
+    @test isapprox(norm(imag(cell_sparse_zero_array[1])), 0.0,atol = 1e-12) # Ensures that the standard FEM method doesn't produce imaginary numbers 
 
 end
