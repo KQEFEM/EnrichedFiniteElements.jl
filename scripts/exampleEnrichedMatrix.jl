@@ -28,7 +28,7 @@ wave_y = 1
 ansatz_wave = wave_func.create_wavenumbers(wave_x, wave_y)
 test_ansatz = wave_func.create_wavenumbers(wave_x, wave_y)
 wavenumbers_ansatz, wavenumbers_test =
-    wave_func.wavenumber_creation(ansatz_wave, test_ansatz, 1)
+    wave_func.wavenumber_creation(ansatz_wave, test_ansatz, 2)
 
 idx_wave_ansatz = collect(1:size(wavenumbers_ansatz, 1))
 idx_wave_test = collect(1:size(wavenumbers_test, 1))
@@ -98,7 +98,7 @@ using DelimitedFiles
 using SparseArrays
 
 # Load the data from the text file
-data = readdlm("test/testdata/MassMatrixEnriched_noFrequencies.txt")
+data = readdlm("test/testdata/MassMatrixEnriched_enriched.txt")
 
 # Extract row indices, column indices, and values
 rows = Int.(data[:, 1])
@@ -108,5 +108,5 @@ vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
 # Reconstruct the sparse matrix
 Mass_matlab = sparse(rows, cols, vals);
 
-println(norm(imag(final_matrix - conj(Mass_matlab))))
+println(norm((final_matrix - conj(Mass_matlab))))
 

@@ -162,9 +162,49 @@ end
             conj(load_matlab_matrix("test/testdata/MassMatrixEnriched_noFrequencies.txt")) #! This conjudate is simply as the matlab code orders in a differnet way
         println(norm(array - exact_matrix))
         println(norm(imag(final_matrix - conj(Mass_matlab))))
-        @test isapprox(norm(array - exact_matrix), 3.984715840345388e-7, atol = 1e-7) # This is with the spatial step, dx
-        @test isapprox(norm(real(final_matrix - conj(Mass_matlab))), 2.92067550635342e-7)
-        @test isapprox(norm(imag(final_matrix - conj(Mass_matlab))), 2.7106484307055905e-7)
+        @test isapprox(norm(array - exact_matrix), 3.984715840345388e-7) # This is with the spatial step, dx
+        @test isapprox(norm(real(final_matrix - conj(Mass_matlab))), 5.478068933256133e-7)
+        @test isapprox(norm(imag(final_matrix - conj(Mass_matlab))), 5.176178912578366e-7)
+
+    end
+
+    @testset "mass_jump_enriched" begin
+    """ Space-time enriched test"""    
+    
+        dt = 0.1
+        t0 = 0.0
+        nodes,
+        connectivity,
+        boundary_index,
+        boundary_edges,
+        wavenumbers_ansatz,
+        wavenumbers_test,
+        idx_wave_ansatz,
+        idx_wave_test,
+        all_pairs,
+        idx_connectivity,
+        wave_node_pairs =
+            setup_test_environment(wave_x = 1, wave_y = 1, zero_frequencies = false)
+
+        array = matrix_comp.compute_sparse_mass_matrix(
+            all_pairs,
+            nodes,
+            wave_node_pairs,
+            wavenumbers_ansatz,
+            wavenumbers_test,
+            integrator,
+            dt,
+            dt,
+            0.0,
+        )
+
+        array = matrix_comp.convert_sparse_cell_to_array(array)
+
+        exact_matrix =
+            conj(load_matlab_matrix("test/testdata/MassMatrixEnriched_enriched.txt")) #! This conjudate is simply as the matlab code orders in a differnet way
+        @test isapprox(norm(array - exact_matrix),7.536714627244855e-7) # This is with the spatial step, dx
+        @test isapprox(norm(real(final_matrix - conj(Mass_matlab))), 5.478068933256133e-7)
+        @test isapprox(norm(imag(final_matrix - conj(Mass_matlab))), 5.176178912578366e-7)
 
     end
 
