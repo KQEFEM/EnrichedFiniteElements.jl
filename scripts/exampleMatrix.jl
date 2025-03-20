@@ -237,16 +237,50 @@ matrix = [
 
 real(cell_sparse_zero_array[1] - matrix)
 diag(real(cell_sparse_zero_array[1] - matrix))
+norm(diag(real(cell_sparse_zero_array[1] - matrix)))
 
 
-############ MASS MATRIX ####################
+############ Enriched MASS MATRIX ####################
 #! This is being used to debug the above 
 
 using Revise
+using EnrichedFiniteElements
+
 using LinearAlgebra  # Import the LinearAlgebra module
 using SparseArrays
 const Transformations = EnrichedFiniteElements.transformationFunctions
 const integrator = EnrichedFiniteElements.Operators
+
+const mesh_create = EnrichedFiniteElements.MeshCreation
+const wave_func = EnrichedFiniteElements.EnrichmentCreator
+
+#! Set up for the matrix creation
+domain = ((0, 1), (0, 1))
+num_nodes = 10
+
+# Create the mesh
+mesh = mesh_create.rectangle_domain(domain)
+
+nodes = mesh.nodes
+connectivity = mesh.connectivity
+boundary_index = mesh.boundary_idx
+boundary_edges = mesh.boundary_edges
+
+wave_x = 0
+wave_y = 0
+ansatz_wave = wave_func.create_wavenumbers(wave_x, wave_y)
+test_ansatz = wave_func.create_wavenumbers(wave_x, wave_y)
+wavenumbers_ansatz, wavenumbers_test =
+    wave_func.wavenumber_creation(ansatz_wave, test_ansatz, 2)
+
+idx_wave_ansatz = collect(1:size(wavenumbers_ansatz, 1))
+idx_wave_test = collect(1:size(wavenumbers_test, 1))
+
+all_pairs = wave_func.generate_pairs(idx_wave_ansatz, idx_wave_test)
+println(all_pairs)
+idx_connectivity = collect(1:size(connectivity, 1))
+result = wave_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)
+
 cell_sparse_zero_array =
     Array{SparseMatrixCSC{ComplexF64,Int64}}(undef, size(all_pairs, 1), size(all_pairs, 1)) # Explicitly specify ComplexF64
 n = size(nodes, 1)
@@ -259,9 +293,10 @@ for ii in result
     #? This is correct
     # ii = result[1]
 
+
     wave_ansatz_loc = wavenumbers_ansatz[ii[1][1][1], :]
     wave_test_loc = wavenumbers_test[ii[1][1][2], :]
-
+    cell_idx = ii[1][1] # this grabs the tuple ( - , - )
 
     triangle_connectivity = ii[2]
 
@@ -272,6 +307,7 @@ for ii in result
 
     kx_kkx = wave_ansatz_loc[1] - wave_test_loc[1]
     ky_kky = wave_ansatz_loc[2] - wave_test_loc[2]
+    omega = [wave_ansatz_loc[3], wave_test_loc[3]]
     A =
         kx_kkx * (triangle_nodes[2, 1] - triangle_nodes[1, 1]) +
         ky_kky * (triangle_nodes[2, 2] - triangle_nodes[1, 2])
@@ -297,7 +333,7 @@ for ii in result
 
     upper_bounds = [1.0, 1.0, 1.0]
     lower_bounds = [-1.0, -1.0, 0.0]
-    omega = [0.0, 0.0]
+    # omega = [0.0, 0.0]
     dt = 0.1
     t_jump = 0.0
     t0 = 0.0
@@ -316,9 +352,10 @@ for ii in result
     )
     # println(v_nabla_q_loc)
     # println(cell_sparse_zero_array[1,2][triangle_connectivity,triangle_connectivity])
-    cell_sparse_zero_array[1, 1][triangle_connectivity, triangle_connectivity] =
-        cell_sparse_zero_array[1, 1][triangle_connectivity, triangle_connectivity] +
-        mass_loc
+    cell_sparse_zero_array[cell_idx[1], cell_idx[2]][
+        triangle_connectivity,
+        triangle_connectivity,
+    ] .+= mass_loc
 
     # upper_bounds::Vector{Float64},
     # lower_bounds::Vector{Float64},
