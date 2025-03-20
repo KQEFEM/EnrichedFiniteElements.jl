@@ -82,9 +82,16 @@ function wavenumber_creation(
     wavenumber_frequency_matrix_ansatz = normalize_zeros(wavenumber_frequency_matrix_ansatz)
     wavenumber_frequency_matrix_test = normalize_zeros(wavenumber_frequency_matrix_test)
 
-    wavenumber_frequency_matrix_ansatz =
-        unique(wavenumber_frequency_matrix_ansatz, dims = 1)
-    wavenumber_frequency_matrix_test = unique(wavenumber_frequency_matrix_test, dims = 1)
+    wavenumber_frequency_matrix_ansatz = sortslices(
+        unique(wavenumber_frequency_matrix_ansatz, dims = 1),
+        dims = 1,
+        by = x -> x[1],
+    )
+    wavenumber_frequency_matrix_test = sortslices(
+        unique(wavenumber_frequency_matrix_test, dims = 1),
+        dims = 1,
+        by = x -> x[1],
+    )
 
     return wavenumber_frequency_matrix_ansatz, wavenumber_frequency_matrix_test
 end
@@ -124,6 +131,7 @@ function combine_wavenumber_with_all_nodes(
 end
 """ 
 Creates the pairs of indices for a connectivity matrix for test and ansatz
+Notice that the ordering is slightly differnet in the julia version compared to matlab. The wavenumber idx goes [1,1],[2,1] compared to matlab [1,1],[1,2]
 """
 function generate_pairs(vector_1::AbstractVector{T}, vector_2::AbstractVector{T}) where {T}
     if isempty(vector_1) || isempty(vector_2)

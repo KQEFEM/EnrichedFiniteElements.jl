@@ -17,8 +17,8 @@ function sparse_matrix_creation(all_pairs, nodes)
     """
     cell_sparse_zero_array = Array{SparseMatrixCSC{ComplexF64,Int64}}(
         undef,
-        size(all_pairs, 1),
-        size(all_pairs, 1),
+        all_pairs[end][1],
+        all_pairs[end][2],
     )
     n = size(nodes, 1)
 
@@ -28,16 +28,6 @@ function sparse_matrix_creation(all_pairs, nodes)
 
     return cell_sparse_zero_array
 end
-
-# function mass_matrix(
-#     nodes::Matrix{Float64},
-#     connectivity::Matrix{Float64},
-#     time,
-#     wavenumbers::Matrix{Float64} = [0, 0, 0],
-# )
-
-
-# end
 
 
 
@@ -84,7 +74,7 @@ end
 function compute_sparse_mass_matrix(
     all_pairs,
     nodes,
-    result,
+    connectivity_matrix,
     wavenumbers_ansatz,
     wavenumbers_test,
     integrator,
@@ -92,10 +82,14 @@ function compute_sparse_mass_matrix(
     t_jump = 0.0,
     t0 = 0.0,
 )
+    """
+    connectivity_matrix: joint connectivity with wavenumbers and nodes
+    """
     cell_sparse_zero_array = sparse_matrix_creation(all_pairs, nodes)
 
-    for ii in result
-        cell_idx = ii[1][1] # this grabs the tuple ( - , - )
+    @views for (idx, ii) in enumerate(connectivity_matrix)
+        #! This can be parallelised but it needs splitting into unique columns wrt to wave-pair 
+        cell_idx = LinearIndices(cell_sparse_zero_array)[ii[1][1][1], ii[1][1][2]] # this grabs the tuple ( - , - )
 
         triangle_nodes, triangle_connectivity = nodal_transformations(ii, nodes)
 
@@ -111,8 +105,8 @@ function compute_sparse_mass_matrix(
         grads_grads_dx = ddx .^ 2
         grads_grads_dy = ddy .^ 2
 
-        upper_bounds = [1.0, 1.0, 1.0]
-        lower_bounds = [-1.0, -1.0, 0.0]
+        upper_bounds = [1.0, 1.0, 1.0] # time integral is a dummy variable here
+        lower_bounds = [-1.0, -1.0, 0.0] # time integral is a dummy variable here
 
         mass_loc, _ = integrator.mass_jump(
             upper_bounds,
@@ -127,15 +121,25 @@ function compute_sparse_mass_matrix(
             tri_area,
         )
 
-        cell_sparse_zero_array[cell_idx[1], cell_idx[2]][
-            triangle_connectivity,
-            triangle_connectivity,
-        ] .+= mass_loc
+        cell_sparse_zero_array[cell_idx][triangle_connectivity, triangle_connectivity] .+=
+            mass_loc
     end
-
+    # cell_sparse_zero_array = reshape(cell_sparse_zero_array,sqrt(idx),:)
     return cell_sparse_zero_array
 end
 
+function convert_sparse_cell_to_array(
+    sparse_cell_array::Matrix{SparseMatrixCSC{ComplexF64,Int64}},
+)
+    num_rows = size(sparse_cell_array, 1)
+    num_cols = size(sparse_cell_array, 2)
+    return reduce(
+        vcat,
+        [reduce(hcat, [sparse_cell_array[i, j] for j = 1:num_cols]) for i = 1:num_rows],
+    )
+
+
+end
 end
 
 
@@ -166,7 +170,7 @@ end
 # 11  10  12
 # 7   9  11]
 
-# matrix_result = [
+# matrix_connectivity_matrix = [
 #     0.0312 0 0 0 0.0078 0 0 0.0078 0 0.0156 0 0
 #     0 0.0234 0 0 0.0059 0.0059 0 0 0 0 0 0.0117
 #     0 0 0.0295 0 0 0.0073 0.0074 0 0 0 0.0148 0
