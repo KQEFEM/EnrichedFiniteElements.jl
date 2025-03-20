@@ -1,8 +1,8 @@
-module transformationFunctionsTests
+module TransformationFunctionsTests
 
 using Test
 using EnrichedFiniteElements
-const transformations = EnrichedFiniteElements.transformationFunctions
+const transformations = EnrichedFiniteElements.TransformationFunctions
 
 @testset "correct_triangle_orientation Tests" begin
     @testset "Incorrect Orientation - Correction Applied" begin

@@ -22,7 +22,7 @@ using .MeshCreation
 include("EnrichmentCreator.jl")
 using .EnrichmentCreator
 
-include("transformationFunctions.jl")
-using .transformationFunctions
+include("TransformationFunctions.jl")
+using .TransformationFunctions
 
 end  # module EnrichedFiniteElements
