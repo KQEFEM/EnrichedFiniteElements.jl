@@ -84,7 +84,7 @@ exact_mat= [0.030877602472284-0.003877008570769im 0.000000000000000 0.0000000000
 0.000000000000000 0.011523333568294-0.001888668887620im 0.000000000000000 0.000000000000000 0.010600531331030-0.001565045746753im 0.009977411412215-0.003882939027479im 0.000000000000000 0.000000000000000 0.000000000000000 0.009245335433152-0.003136767827467im 0.008779916473549-0.004322366957603im 0.050421595925460-0.014777582537093im
 ]
 
-println(norm(cell_sparse_zero_array_2[end-1,end] - exact_mat))
+println(norm(cell_sparse_zero_array_2[end-1,end] - conj(exact_mat)))
 
 using DelimitedFiles
 using SparseArrays
@@ -100,5 +100,5 @@ vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
 # Reconstruct the sparse matrix
 Mass_matlab = sparse(rows, cols, vals);
 
-println(norm(conj(final_matrix) - Mass_matlab))
+println(norm(final_matrix - conj(Mass_matlab)))
  

@@ -11,4 +11,4 @@ export_data = [row, col, val_real, val_imag];
 dlmwrite('E:/Git/EnrichedFiniteElements.jl/test/testdata/MassMatrixEnriched_noFrequencies.txt', export_data, 'delimiter', ' ', 'precision', '%.15f');
 
 
-% dlmwrite('Mass_DIAG.txt', full(cell2mat(Mass_DIAG(end,end))), 'delimiter', ' ', 'precision', '%.15f');
+% dlmwrite('E:/Git/EnrichedFiniteElements.jl/test/testdata/Mass_DIAG.txt', full(cell2mat(Mass_DIAG(end,end-1))), 'delimiter', ' ', 'precision', '%.15f');

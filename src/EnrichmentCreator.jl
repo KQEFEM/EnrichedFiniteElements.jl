@@ -124,6 +124,7 @@ function combine_wavenumber_with_all_nodes(
 end
 """ 
 Creates the pairs of indices for a connectivity matrix for test and ansatz
+Notice that the ordering is slightly differnet in the julia version compared to matlab. The wavenumber idx goes [1,1],[2,1] compared to matlab [1,1],[1,2]
 """
 function generate_pairs(vector_1::AbstractVector{T}, vector_2::AbstractVector{T}) where {T}
     if isempty(vector_1) || isempty(vector_2)
