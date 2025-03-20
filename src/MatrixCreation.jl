@@ -82,14 +82,14 @@ function compute_sparse_mass_matrix(
     t_jump = 0.0,
     t0 = 0.0,
 )
-"""
-connectivity_matrix: joint connectivity with wavenumbers and nodes
-"""
+    """
+    connectivity_matrix: joint connectivity with wavenumbers and nodes
+    """
     cell_sparse_zero_array = sparse_matrix_creation(all_pairs, nodes)
 
     @views for (idx, ii) in enumerate(connectivity_matrix)
         #! This can be parallelised but it needs splitting into unique columns wrt to wave-pair 
-        cell_idx = LinearIndices(cell_sparse_zero_array)[ii[1][1][1],ii[1][1][2]] # this grabs the tuple ( - , - )
+        cell_idx = LinearIndices(cell_sparse_zero_array)[ii[1][1][1], ii[1][1][2]] # this grabs the tuple ( - , - )
 
         triangle_nodes, triangle_connectivity = nodal_transformations(ii, nodes)
 
@@ -121,22 +121,25 @@ connectivity_matrix: joint connectivity with wavenumbers and nodes
             tri_area,
         )
 
-        cell_sparse_zero_array[cell_idx][
-            triangle_connectivity,
-            triangle_connectivity,
-        ] .+= mass_loc
+        cell_sparse_zero_array[cell_idx][triangle_connectivity, triangle_connectivity] .+=
+            mass_loc
     end
     # cell_sparse_zero_array = reshape(cell_sparse_zero_array,sqrt(idx),:)
     return cell_sparse_zero_array
 end
 
-function convert_sparse_cell_to_array(sparse_cell_array::Matrix{SparseMatrixCSC{ComplexF64, Int64}})
-    num_rows = size(sparse_cell_array,1)
-num_cols = size(sparse_cell_array,2)
-return reduce(vcat, [reduce(hcat, [sparse_cell_array[i, j] for j in 1:num_cols]) for i in 1:num_rows]);
+function convert_sparse_cell_to_array(
+    sparse_cell_array::Matrix{SparseMatrixCSC{ComplexF64,Int64}},
+)
+    num_rows = size(sparse_cell_array, 1)
+    num_cols = size(sparse_cell_array, 2)
+    return reduce(
+        vcat,
+        [reduce(hcat, [sparse_cell_array[i, j] for j = 1:num_cols]) for i = 1:num_rows],
+    )
 
 
-end 
+end
 end
 
 

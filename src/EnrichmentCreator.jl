@@ -82,9 +82,16 @@ function wavenumber_creation(
     wavenumber_frequency_matrix_ansatz = normalize_zeros(wavenumber_frequency_matrix_ansatz)
     wavenumber_frequency_matrix_test = normalize_zeros(wavenumber_frequency_matrix_test)
 
-    wavenumber_frequency_matrix_ansatz =
-    sortslices(unique(wavenumber_frequency_matrix_ansatz, dims = 1), dims=1, by=x -> x[1])
-    wavenumber_frequency_matrix_test = sortslices(unique(wavenumber_frequency_matrix_test, dims = 1), dims=1, by=x -> x[1])
+    wavenumber_frequency_matrix_ansatz = sortslices(
+        unique(wavenumber_frequency_matrix_ansatz, dims = 1),
+        dims = 1,
+        by = x -> x[1],
+    )
+    wavenumber_frequency_matrix_test = sortslices(
+        unique(wavenumber_frequency_matrix_test, dims = 1),
+        dims = 1,
+        by = x -> x[1],
+    )
 
     return wavenumber_frequency_matrix_ansatz, wavenumber_frequency_matrix_test
 end
