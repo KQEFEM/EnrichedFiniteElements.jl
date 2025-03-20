@@ -1,8 +1,8 @@
-module transformationFunctionsTests
+module TransformationFunctionsTests
 
 using Test
 using EnrichedFiniteElements
-const transformations = EnrichedFiniteElements.transformationFunctions
+const transformations = EnrichedFiniteElements.TransformationFunctions
 
 @testset "correct_triangle_orientation Tests" begin
     @testset "Incorrect Orientation - Correction Applied" begin
@@ -67,9 +67,9 @@ end
         x4 = [0.0, 2.0, 0.0]
         y4 = [0.0, 0.0, 2.0]
         area4, b4, c4 = transformations.Gradients_Larson(x4, y4) # Corrected function call
-        println(area4)
-        println(b4)
-        println(c4)
+        # println(area4)
+        # println(b4)
+        # println(c4)
         @test area4 ≈ 2.0
         @test b4 ≈ [-0.5, 0.5, 0.0]
         @test c4 ≈ [-0.5, 0.0, 0.5]

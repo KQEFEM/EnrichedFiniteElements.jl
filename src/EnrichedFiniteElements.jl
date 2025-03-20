@@ -13,6 +13,9 @@ using .IntegrationWrappers  # Use IntegrationWrappers
 include("Operators.jl")      # Include Operators LAST
 using .Operators           # Use Operators
 
+include("TransformationFunctions.jl")
+using .TransformationFunctions
+
 include("MatrixCreation.jl")
 using .MatrixCreation
 
@@ -22,7 +25,6 @@ using .MeshCreation
 include("EnrichmentCreator.jl")
 using .EnrichmentCreator
 
-include("transformationFunctions.jl")
-using .transformationFunctions
+
 
 end  # module EnrichedFiniteElements

@@ -1,4 +1,4 @@
-module transformationFunctions
+module TransformationFunctions
 using PolygonOps
 
 """

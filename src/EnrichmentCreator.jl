@@ -16,10 +16,15 @@ using Base.Iterators
 """
 #@docs EnrichedFiniteElements.EnrichmentCreator.create_wavenumbers
 function create_wavenumbers(x_enrichments::Real, y_enrichments::Real)
-    wavenumbers = collect(
-        Iterators.product(-x_enrichments:x_enrichments, -y_enrichments:y_enrichments),
+    wavenumbers = reshape(
+        collect(
+            Iterators.product(-x_enrichments:x_enrichments, -y_enrichments:y_enrichments),
+        ),
+        :,
+        1,
     )
-    return Matrix(reshape(reinterpret(Int64, wavenumbers), :, 2))
+    return hcat(first.(wavenumbers), last.(wavenumbers))
+
 end
 
 """
