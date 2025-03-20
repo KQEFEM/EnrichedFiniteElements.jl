@@ -74,7 +74,7 @@ end
 function compute_sparse_mass_matrix(
     all_pairs,
     nodes,
-    result,
+    connectivity_matrix,
     wavenumbers_ansatz,
     wavenumbers_test,
     integrator,
@@ -82,9 +82,12 @@ function compute_sparse_mass_matrix(
     t_jump = 0.0,
     t0 = 0.0,
 )
+"""
+connectivity_matrix: joint connectivity with wavenumbers and nodes
+"""
     cell_sparse_zero_array = sparse_matrix_creation(all_pairs, nodes)
 
-    @views for (idx, ii) in enumerate(result)
+    @views for (idx, ii) in enumerate(connectivity_matrix)
         #! This can be parallelised but it needs splitting into unique columns wrt to wave-pair 
         cell_idx = LinearIndices(cell_sparse_zero_array)[ii[1][1][1],ii[1][1][2]] # this grabs the tuple ( - , - )
 
@@ -157,7 +160,7 @@ end
 # 11  10  12
 # 7   9  11]
 
-# matrix_result = [
+# matrix_connectivity_matrix = [
 #     0.0312 0 0 0 0.0078 0 0 0.0078 0 0.0156 0 0
 #     0 0.0234 0 0 0.0059 0.0059 0 0 0 0 0 0.0117
 #     0 0 0.0295 0 0 0.0073 0.0074 0 0 0 0.0148 0
