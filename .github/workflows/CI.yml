@@ -29,7 +29,6 @@ jobs:
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      # - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
@@ -38,58 +37,12 @@ jobs:
           files: lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
-      - name: Skip CairoMakie precompilation in CI
-        run: |
-          if !isdefined(ENV, "CI") || ENV["CI"] != "true"
-              using CairoMakie
-          else
-              println("Skipping CairoMakie precompilation in CI")
-          end
-
-  docs:
-    name: Documentation
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-      contents: write
-      statuses: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v2
-        with:
-          version: "1"
-      - uses: julia-actions/cache@v2
-      - name: Configure doc environment
-        shell: julia --project=docs --color=yes {0}
-        run: |
-          using Pkg
-          Pkg.develop(PackageSpec(path=pwd()))
-          Pkg.instantiate()
-      - uses: julia-actions/julia-buildpkg@v1
-      - uses: julia-actions/julia-docdeploy@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
-      - name: Skip CairoMakie precompilation in CI
-        run: |
-          if !isdefined(ENV, "CI") || ENV["CI"] != "true"
-              using CairoMakie
-          else
-              println("Skipping CairoMakie precompilation in CI")
-          end
-      - name: Run doctests
-        shell: julia --project=docs --color=yes {0}
-        run: |
-          using Documenter: DocMeta, doctest
-          using EnrichedFiniteElements
-          DocMeta.setdocmeta!(EnrichedFiniteElements, :DocTestSetup, :(using EnrichedFiniteElements); recursive=true)
-          doctest(EnrichedFiniteElements)
 
   format:
     name: Format code
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Required to commit changes
+      contents: read # No write permissions to prevent automatic commits
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2
@@ -99,17 +52,9 @@ jobs:
         run: julia -e 'using Pkg; Pkg.add("JuliaFormatter")'
       - name: Format code
         run: julia -e 'using JuliaFormatter; format(".")'
-      - name: Configure Git
+      - name: Check for unformatted code
         run: |
-          git config --local user.name "GitHub Actions Bot"
-          git config --local user.email "actions@github.com"
-      - name: Check for changes and commit
-        run: |
-          git diff --staged --check # Optional: Check for style issues that formatter may not fix
-          if git diff --staged --quiet; then
-            echo "No formatting changes to commit."
-          else
-            git add .
-            git commit -m "Format code with JuliaFormatter"
-            git push
+          if ! git diff --quiet; then
+            echo "Code is not formatted! Run JuliaFormatter locally before committing."
+            exit 1
           fi

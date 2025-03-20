@@ -16,10 +16,15 @@ using Base.Iterators
 """
 #@docs EnrichedFiniteElements.EnrichmentCreator.create_wavenumbers
 function create_wavenumbers(x_enrichments::Real, y_enrichments::Real)
-    wavenumbers = collect(
-        Iterators.product(-x_enrichments:x_enrichments, -y_enrichments:y_enrichments),
+    wavenumbers = reshape(
+        collect(
+            Iterators.product(-x_enrichments:x_enrichments, -y_enrichments:y_enrichments),
+        ),
+        :,
+        1,
     )
-    return reshape(wavenumbers, :, 1)
+    return hcat(first.(wavenumbers), last.(wavenumbers))
+
 end
 
 """
@@ -70,10 +75,23 @@ function wavenumber_creation(
                 [wavenumbers_test[ii, 1], wavenumbers_test[ii, 2], freq_test]
         end
     end
+    # **Normalize Zero Values to Ensure -0.0 and 0.0 Are Treated as the Same**
+    function normalize_zeros(matrix)
+        return map(x -> iszero(x) ? 0.0 : x, matrix)
+    end
+    wavenumber_frequency_matrix_ansatz = normalize_zeros(wavenumber_frequency_matrix_ansatz)
+    wavenumber_frequency_matrix_test = normalize_zeros(wavenumber_frequency_matrix_test)
 
-    wavenumber_frequency_matrix_ansatz =
-        unique(wavenumber_frequency_matrix_ansatz, dims = 1)
-    wavenumber_frequency_matrix_test = unique(wavenumber_frequency_matrix_test, dims = 1)
+    wavenumber_frequency_matrix_ansatz = sortslices(
+        unique(wavenumber_frequency_matrix_ansatz, dims = 1),
+        dims = 1,
+        by = x -> x[1],
+    )
+    wavenumber_frequency_matrix_test = sortslices(
+        unique(wavenumber_frequency_matrix_test, dims = 1),
+        dims = 1,
+        by = x -> x[1],
+    )
 
     return wavenumber_frequency_matrix_ansatz, wavenumber_frequency_matrix_test
 end
@@ -113,6 +131,7 @@ function combine_wavenumber_with_all_nodes(
 end
 """ 
 Creates the pairs of indices for a connectivity matrix for test and ansatz
+Notice that the ordering is slightly differnet in the julia version compared to matlab. The wavenumber idx goes [1,1],[2,1] compared to matlab [1,1],[1,2]
 """
 function generate_pairs(vector_1::AbstractVector{T}, vector_2::AbstractVector{T}) where {T}
     if isempty(vector_1) || isempty(vector_2)
