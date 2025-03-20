@@ -5,7 +5,7 @@ using Test
 using EnrichedFiniteElements
 
 const wavenumber_func = EnrichedFiniteElements.EnrichmentCreator
-
+@testset "EnrichmentCreatorTests" begin
 @testset "wavenumber_creation" begin
     wavenumbers_ansatz = [1 1; 1 -1] # Use Ints from the start
     wavenumbers_test = wavenumbers_ansatz
@@ -28,27 +28,19 @@ end
 
 
 @testset "create_wavenumbers" begin
+    @testset "enrichments" begin
     # Test case 1: Basic test with integer enrichments
     x_enrichments = 1
     y_enrichments = 1
 
     # Correct way to create the expected array of tuples:
-    expected_wavenumbers = [
-        -1 0
-        -1 1
-        0 0
-        -1 -1
-        1 1
-        -1 0
-        -1 1
-        0 1
-        0 1
-    ]
+    expected_wavenumbers = [-1 -1; 0 -1; 1 -1; -1 0; 0 0; 1 0; -1 1; 0 1; 1 1]
     # expected_wavenumbers = reshape(expected_wavenumbers, :, 1) # Reshape directly (no collect needed)
     actual_wavenumbers = wavenumber_func.create_wavenumbers(x_enrichments, y_enrichments)
-
+        
     @test actual_wavenumbers == expected_wavenumbers
-
+    end 
+    @testset "zero_enrich" begin
     # Test case 2: Test with zero enrichments
     x_enrichments = 0
     y_enrichments = 0
@@ -56,6 +48,7 @@ end
     # expected_wavenumbers = reshape(expected_wavenumbers, :, 1)  # Reshape directly
     actual_wavenumbers = wavenumber_func.create_wavenumbers(x_enrichments, y_enrichments)
     @test actual_wavenumbers == expected_wavenumbers
+    end 
 end
 
 # Unit Tests
@@ -136,3 +129,5 @@ end
 
 
 end
+
+end 

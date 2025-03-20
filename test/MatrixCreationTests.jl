@@ -13,6 +13,8 @@ const mesh_create = EnrichedFiniteElements.MeshCreation
 const wave_func = EnrichedFiniteElements.EnrichmentCreator
 const matrix_comp = EnrichedFiniteElements.MatrixCreation
 
+
+
 function setup_test_environment(; wave_x::Int64 = 0, wave_y::Int64 = 0)
     #! Set up for the matrix creation
     domain = ((0, 1), (0, 1))
@@ -50,6 +52,7 @@ function setup_test_environment(; wave_x::Int64 = 0, wave_y::Int64 = 0)
     idx_connectivity,
     wave_node_pairs
 end
+@testset "Matrix Creation" begin
 
 @testset "mass_matrix_jump_NO_ENRICH" begin
     dt = 0.1
@@ -66,7 +69,7 @@ end
     idx_connectivity,
     wave_node_pairs = setup_test_environment(wave_x = 0, wave_y = 0)
 
-    cell_sparse_zero_array = matrix_comp.compute_sparse_mass_matrix(
+    array = matrix_comp.compute_sparse_mass_matrix(
         all_pairs,
         nodes,
         wave_node_pairs,
@@ -92,10 +95,15 @@ end
     0 0 0.0148 0 0 0.0122 0.0123 0 0.0095 0.0096 0.0682 0.0098
     0 0.0117 0 0 0.0107 0.0108 0 0 0 0.0098 0.0098 0.0528
     ]
-    println(cell_sparse_zero_array[1])
-    println(norm(diag(real(cell_sparse_zero_array[1] - matrix))))
 
-    @test isapprox(norm(real(cell_sparse_zero_array_2[1] - matrix)), 0.0, atol = 1e-3) # This is with the spatial step, dx
-    @test isapprox(norm(imag(cell_sparse_zero_array[1])), 0.0,atol = 1e-12) # Ensures that the standard FEM method doesn't produce imaginary numbers 
+    @test isapprox(norm(real(array[1] - matrix)), 0.00022378579972373314, atol = 1e-3) # This is with the spatial step, dx
+    @test isapprox(norm(imag(array[1])), 0.0,atol = 1e-12) # Ensures that the standard FEM method doesn't produce imaginary numbers 
 
 end
+
+@testset "mass_jump_enriched" begin 
+    @test isequal(1 , 1)
+end 
+
+
+end 

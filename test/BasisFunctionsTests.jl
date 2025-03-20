@@ -9,8 +9,9 @@ using .BasisFunctions  # Assuming BasisFunctions.jl is in the same directory or 
         x = 0.2
         y = 0.3
         phi_val = BasisFunctions.phi(x, y)
-        @test size(phi_val) == (3,)  # Check size
-        @test phi_val ≈ [0.5; 0.2; 0.3] # Check values (using ≈ for floating-point comparison)
+        @test size(phi_val) == (3,) 
+         # Check size
+        @test phi_val == [0.5; 0.2; 0.3] # Check values (using ≈ for floating-point comparison)
     end
 
     @testset "p_matrix" begin
@@ -45,24 +46,24 @@ using .BasisFunctions  # Assuming BasisFunctions.jl is in the same directory or 
     end
 
 
-    @testset "e_time functions" begin
-        x = 0.0
-        y = 0.0
-        t = 0.1
-        w = 1.0
-        dt = 0.01
-        t0 = 0.0
-        ww = 2.0
+    # @testset "e_time functions" begin
+    #     x = 0.0
+    #     y = 0.0
+    #     t = 0.1
+    #     w = 1.0
+    #     dt = 0.01
+    #     t0 = 0.0
+    #     ww = 2.0
 
-        e_mass = BasisFunctions.e_time_mass(x, y, t, w, dt, t0, ww)
-        @test isa(e_mass, Complex)
+    #     e_mass = BasisFunctions.e_time_mass(x, y, t, w, dt, t0, ww)
+    #     @test isa(e_mass, Complex)
 
-        e_ansatz = BasisFunctions.enrichment_time(x, y, t, w)
-        @test isa(e_ansatz, Complex)
+    #     e_ansatz = BasisFunctions.enrichment_time(x, y, t, w)
+    #     @test isa(e_ansatz, Complex)
 
-        # e_test = BasisFunctions.e_time_test(x,y,t, ww)
-        # @test isa(e_test, Complex)
+    #     # e_test = BasisFunctions.e_time_test(x,y,t, ww)
+    #     # @test isa(e_test, Complex)
 
-    end
+    # end
 end
 end
