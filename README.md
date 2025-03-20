@@ -25,3 +25,5 @@ Pkg.add(url="https://github.com/KQEFEM/EnrichedFiniteElements.jl")
 ```
 ## Note
 The Docker container is only tested on Apple Silicon. 
+CI fails and to be looked at  
+
