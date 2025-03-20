@@ -190,7 +190,8 @@ for ii in result
 
     mass_loc, _ = integrator.mass_jump(
         upper_bounds,
-        lower_bounds,        A,
+        lower_bounds,
+        A,
         B,
         C,
         omega,
