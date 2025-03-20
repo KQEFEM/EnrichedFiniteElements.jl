@@ -130,6 +130,13 @@ connectivity_matrix: joint connectivity with wavenumbers and nodes
     return cell_sparse_zero_array
 end
 
+function convert_sparse_cell_to_array(sparse_cell_array::Matrix{SparseMatrixCSC{ComplexF64, Int64}})
+    num_rows = size(sparse_cell_array,1)
+num_cols = size(sparse_cell_array,2)
+return reduce(vcat, [reduce(hcat, [sparse_cell_array[i, j] for j in 1:num_cols]) for i in 1:num_rows]);
+
+
+end 
 end
 
 

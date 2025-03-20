@@ -100,5 +100,5 @@ vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
 # Reconstruct the sparse matrix
 Mass_matlab = sparse(rows, cols, vals);
 
-println(norm(final_matrix - conj(Mass_matlab)))
+println(norm(imag(final_matrix - conj(Mass_matlab))))
  
