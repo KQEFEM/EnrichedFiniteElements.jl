@@ -160,11 +160,11 @@ end
 
         exact_matrix =
             conj(load_matlab_matrix("test/testdata/MassMatrixEnriched_noFrequencies.txt")) #! This conjudate is simply as the matlab code orders in a differnet way
-        println(norm(array - exact_matrix))
-        println(norm(imag(final_matrix - conj(Mass_matlab))))
+        # println(norm(array - exact_matrix))
+        # println(norm(imag(final_matrix - exact_matrix)))
         @test isapprox(norm(array - exact_matrix), 3.984715840345388e-7) # This is with the spatial step, dx
-        @test isapprox(norm(real(final_matrix - conj(Mass_matlab))), 5.478068933256133e-7)
-        @test isapprox(norm(imag(final_matrix - conj(Mass_matlab))), 5.176178912578366e-7)
+        @test isapprox(norm(real(array - exact_matrix)), 2.92067550635342e-7)
+        @test isapprox(norm(imag(array - exact_matrix)), 2.7106484307055905e-7)
 
     end
 
@@ -203,8 +203,8 @@ end
         exact_matrix =
             conj(load_matlab_matrix("test/testdata/MassMatrixEnriched_enriched.txt")) #! This conjudate is simply as the matlab code orders in a differnet way
         @test isapprox(norm(array - exact_matrix),7.536714627244855e-7) # This is with the spatial step, dx
-        @test isapprox(norm(real(final_matrix - conj(Mass_matlab))), 5.478068933256133e-7)
-        @test isapprox(norm(imag(final_matrix - conj(Mass_matlab))), 5.176178912578366e-7)
+        @test isapprox(norm(real(array - exact_matrix)), 5.478068933256133e-7)
+        @test isapprox(norm(imag(array - exact_matrix)), 5.176178912578366e-7)
 
     end
 
