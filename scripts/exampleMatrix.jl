@@ -35,7 +35,7 @@ result = wave_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)
 using Revise
 using LinearAlgebra  # Import the LinearAlgebra module
 using SparseArrays
-const Transformations = EnrichedFiniteElements.transformationFunctions
+const Transformations = EnrichedFiniteElements.TransformationFunctions
 const integrator = EnrichedFiniteElements.Operators
 cell_sparse_zero_array =
     Array{SparseMatrixCSC{ComplexF64,Int64}}(undef, size(all_pairs, 1), size(all_pairs, 1)) # Explicitly specify ComplexF64
@@ -131,7 +131,7 @@ real(cell_sparse_zero_array[1]) / 0.4375^2
 using Revise
 using LinearAlgebra  # Import the LinearAlgebra module
 using SparseArrays
-const Transformations = EnrichedFiniteElements.transformationFunctions
+const Transformations = EnrichedFiniteElements.TransformationFunctions
 const integrator = EnrichedFiniteElements.Operators
 cell_sparse_zero_array =
     Array{SparseMatrixCSC{ComplexF64,Int64}}(undef, size(all_pairs, 1), size(all_pairs, 1)) # Explicitly specify ComplexF64
@@ -248,7 +248,7 @@ using EnrichedFiniteElements
 
 using LinearAlgebra  # Import the LinearAlgebra module
 using SparseArrays
-const Transformations = EnrichedFiniteElements.transformationFunctions
+const Transformations = EnrichedFiniteElements.TransformationFunctions
 const integrator = EnrichedFiniteElements.Operators
 
 const mesh_create = EnrichedFiniteElements.MeshCreation
