@@ -40,7 +40,7 @@ result = wave_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)
 
 wave_node_pairs = result
 dt = 0.1
-cell_sparse_zero_array_2 = matrix_comp.compute_sparse_mass_matrix(
+cell_sparse_zero_array_2 = matrix_comp.compute_sparse_matrix(
     all_pairs,
     nodes,
     wave_node_pairs,
@@ -57,10 +57,7 @@ num_rows = size(cell_sparse_zero_array_2, 1)
 num_cols = size(cell_sparse_zero_array_2, 2)
 final_matrix = reduce(
     vcat,
-    [
-        reduce(hcat, [cell_sparse_zero_array_2[i, j] for j = 1:num_cols]) for
-        i = 1:num_rows
-    ],
+    [reduce(hcat, [cell_sparse_zero_array_2[i, j] for j = 1:num_cols]) for i = 1:num_rows],
 );
 
 exact_mat = [

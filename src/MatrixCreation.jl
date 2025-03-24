@@ -71,7 +71,7 @@ function enrichment_transformations(
     return kx_kkx, ky_kky, omega, A, B, C
 end
 
-function compute_sparse_mass_matrix(
+function compute_sparse_matrix(
     all_pairs,
     nodes,
     connectivity_matrix,
@@ -81,15 +81,33 @@ function compute_sparse_mass_matrix(
     dt,
     t_jump = 0.0,
     t0 = 0.0,
+    mass_bool::Bool = false,
+    convection_bool::Bool = false,
+    test_bool::Bool = true,
 )
     """
-    connectivity_matrix: joint connectivity with wavenumbers and nodes
-    """
-    cell_sparse_zero_array = sparse_matrix_creation(all_pairs, nodes)
+    This will create the matrices based on the booleon's given. 
+    Note; All matrices will have the same size. 
+    Note: This code currently needs to be ran separately for the mass jumps
 
+    test_bool: will create the mass matrix 
+    connectivity_matrix: joint connectivity with wavenumbers and nodes
+
+    """
+    if test_bool == true | mass_bool == true
+        mass_sparse_array = sparse_matrix_creation(all_pairs, nodes)
+    end
+    if convection_bool == true
+        pDtq_array = sparse_matrix_creation(all_pairs, nodes)
+        #! There will be tohers to add also
+
+    end
+    if convection_bool == true | mass_bool == true
+        test_bool == false
+    end
     @views for (idx, ii) in enumerate(connectivity_matrix)
         #! This can be parallelised but it needs splitting into unique columns wrt to wave-pair 
-        cell_idx = LinearIndices(cell_sparse_zero_array)[ii[1][1][1], ii[1][1][2]] # this grabs the tuple ( - , - )
+        cell_idx = LinearIndices(mass_sparse_array)[ii[1][1][1], ii[1][1][2]] # this grabs the tuple ( - , - )
 
         triangle_nodes, triangle_connectivity = nodal_transformations(ii, nodes)
 
@@ -121,11 +139,14 @@ function compute_sparse_mass_matrix(
             tri_area,
         )
 
-        cell_sparse_zero_array[cell_idx][triangle_connectivity, triangle_connectivity] .+=
+        pdtq_loc, _ = integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega)
+
+        mass_sparse_array[cell_idx][triangle_connectivity, triangle_connectivity] .+=
             mass_loc
+        pDtq_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= pdtq_loc
     end
-    # cell_sparse_zero_array = reshape(cell_sparse_zero_array,sqrt(idx),:)
-    return cell_sparse_zero_array
+    # mass_sparse_array = reshape(mass_sparse_array,sqrt(idx),:)
+    return mass_sparse_array, pDtq_array
 end
 
 function convert_sparse_cell_to_array(

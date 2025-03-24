@@ -96,7 +96,7 @@ end
         idx_connectivity,
         wave_node_pairs = setup_test_environment(wave_x = 0, wave_y = 0)
 
-        array = matrix_comp.compute_sparse_mass_matrix(
+        array = matrix_comp.compute_sparse_matrix(
             all_pairs,
             nodes,
             wave_node_pairs,
@@ -144,7 +144,7 @@ end
         wave_node_pairs =
             setup_test_environment(wave_x = 1, wave_y = 1, zero_frequencies = true)
 
-        array = matrix_comp.compute_sparse_mass_matrix(
+        array = matrix_comp.compute_sparse_matrix(
             all_pairs,
             nodes,
             wave_node_pairs,
@@ -169,8 +169,8 @@ end
     end
 
     @testset "mass_jump_enriched" begin
-    """ Space-time enriched test"""    
-    
+        """ Space-time enriched test"""
+
         dt = 0.1
         t0 = 0.0
         nodes,
@@ -186,7 +186,7 @@ end
         wave_node_pairs =
             setup_test_environment(wave_x = 1, wave_y = 1, zero_frequencies = false)
 
-        array = matrix_comp.compute_sparse_mass_matrix(
+        array = matrix_comp.compute_sparse_matrix(
             all_pairs,
             nodes,
             wave_node_pairs,
@@ -202,7 +202,7 @@ end
 
         exact_matrix =
             conj(load_matlab_matrix("test/testdata/MassMatrixEnriched_enriched.txt")) #! This conjudate is simply as the matlab code orders in a differnet way
-        @test isapprox(norm(array - exact_matrix),7.536714627244855e-7) # This is with the spatial step, dx
+        @test isapprox(norm(array - exact_matrix), 7.536714627244855e-7) # This is with the spatial step, dx
         @test isapprox(norm(real(array - exact_matrix)), 5.478068933256133e-7)
         @test isapprox(norm(imag(array - exact_matrix)), 5.176178912578366e-7)
 
