@@ -127,14 +127,14 @@ function compute_sparse_matrix(
         grads_grads_dx = ddx .^ 2
         grads_grads_dy = ddy .^ 2
 
-      
+
         cell_idx = LinearIndices(indexing_array)[ii[1][1][1], ii[1][1][2]] # this grabs the tuple ( - , - )
 
         if mass_bool == true
             upper_bounds = [1.0, 1.0, 1.0] # time integral is a dummy variable here
             lower_bounds = [-1.0, -1.0, 0.0] # time integral is a dummy variable here
-    
-    
+
+
             mass_sparse_array = create_components_mass_matrix(
                 mass_sparse_array,
                 cell_idx,
@@ -152,11 +152,12 @@ function compute_sparse_matrix(
             )
         end
         if convection_bool == true
-            upper_bounds = [1.0, 1.0,dt] 
-            lower_bounds = [-1.0, -1.0, 0.0] 
-    
-    
-            pdtq_loc, _ = integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega,t0,tri_area)
+            upper_bounds = [1.0, 1.0, dt]
+            lower_bounds = [-1.0, -1.0, 0.0]
+
+
+            pdtq_loc, _ =
+                integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega, t0, tri_area)
 
             pDtq_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= pdtq_loc
         end

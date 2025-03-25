@@ -97,7 +97,7 @@ function e_time_mass(
     return exp(1im * w * dt) * exp(-1im * ww * (t_jump - t0))
 end
 
-function enrichment_time(x::Real, y::Real, t::Real, w::Float64,t0::Real)
+function enrichment_time(x::Real, y::Real, t::Real, w::Float64, t0::Real)
     """
     Defines the time enrichment function for the ansatz function.
 
@@ -108,7 +108,7 @@ function enrichment_time(x::Real, y::Real, t::Real, w::Float64,t0::Real)
     Returns:
         A complex number.
     """
-    return exp(1im * w * (t-t0))
+    return exp(1im * w * (t - t0))
 end
 
 function e_time_test(x::Real, y::Real, t::Real, ww::Vector{Float64})

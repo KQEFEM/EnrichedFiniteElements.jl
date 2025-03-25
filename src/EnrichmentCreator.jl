@@ -50,7 +50,6 @@ function wavenumber_creation(
     wavenumbers_test::Matrix{<:Real};
     Number_of_Frequencies_per_Wavenumber::Int64 = 2,
     time_enrichment_only::Bool = false,
-
 )
     num_rows = size(wavenumbers_ansatz, 1) * Number_of_Frequencies_per_Wavenumber
     wavenumber_frequency_matrix_ansatz = zeros(Float64, num_rows, 3)
@@ -82,34 +81,34 @@ function wavenumber_creation(
         return map(x -> iszero(x) ? 0.0 : x, matrix)
     end
     if time_enrichment_only == true
-        wavenumber_frequency_matrix_ansatz[:,1:2] .= 0
-        wavenumber_frequency_matrix_test[:,1:2] .= 0
+        wavenumber_frequency_matrix_ansatz[:, 1:2] .= 0
+        wavenumber_frequency_matrix_test[:, 1:2] .= 0
     end
     wavenumber_frequency_matrix_ansatz = normalize_zeros(wavenumber_frequency_matrix_ansatz)
     wavenumber_frequency_matrix_test = normalize_zeros(wavenumber_frequency_matrix_test)
     if time_enrichment_only == false
-    wavenumber_frequency_matrix_ansatz = sortslices(
-        unique(wavenumber_frequency_matrix_ansatz, dims = 1),
-        dims = 1,
-        by = x -> x[1],
-    )
-    wavenumber_frequency_matrix_test = sortslices(
-        unique(wavenumber_frequency_matrix_test, dims = 1),
-        dims = 1,
-        by = x -> x[1],
-    )
+        wavenumber_frequency_matrix_ansatz = sortslices(
+            unique(wavenumber_frequency_matrix_ansatz, dims = 1),
+            dims = 1,
+            by = x -> x[1],
+        )
+        wavenumber_frequency_matrix_test = sortslices(
+            unique(wavenumber_frequency_matrix_test, dims = 1),
+            dims = 1,
+            by = x -> x[1],
+        )
     else
         wavenumber_frequency_matrix_ansatz = sortslices(
-        unique(wavenumber_frequency_matrix_ansatz, dims = 1),
-        dims = 1,
-        by = x -> x[3],
-    )
-    wavenumber_frequency_matrix_test = sortslices(
-        unique(wavenumber_frequency_matrix_test, dims = 1),
-        dims = 1,
-        by = x -> x[3],
-    )
-    end 
+            unique(wavenumber_frequency_matrix_ansatz, dims = 1),
+            dims = 1,
+            by = x -> x[3],
+        )
+        wavenumber_frequency_matrix_test = sortslices(
+            unique(wavenumber_frequency_matrix_test, dims = 1),
+            dims = 1,
+            by = x -> x[3],
+        )
+    end
 
     return wavenumber_frequency_matrix_ansatz, wavenumber_frequency_matrix_test
 end

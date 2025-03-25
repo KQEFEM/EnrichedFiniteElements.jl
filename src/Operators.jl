@@ -22,7 +22,7 @@ function pDtq(
     C_val::Float64,
     omega::Vector{Float64},
     t0::Real,
-    triangle_area::Float64
+    triangle_area::Float64,
 )
 
     function integrand(v)
@@ -52,7 +52,7 @@ function pDtq(
                space_enrichment *
                time_enrichment *
                hat_ansatz *
-               (-im*omega[2] * hat_test')  # Multiply the RESULTS
+               (-im * omega[2] * hat_test')  # Multiply the RESULTS
     end
     integral_result, abs_error = hcubature(integrand, lower_bounds, upper_bounds) # Use integrand
     return integral_result, abs_error
