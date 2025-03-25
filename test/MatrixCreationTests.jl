@@ -325,8 +325,6 @@ end
             array = matrix_comp.convert_sparse_cell_to_array(conv)
             exact_matrix =
                 transpose(load_matlab_matrix("test/testdata/ConvectionDt_space_time.txt")) #! This transpose is simply as the matlab code orders in a differnet way
-            println(norm(exact_matrix))
-            println(norm(array))
             @test isapprox(norm(real(array - exact_matrix)), 6.187951325268305e-8)
 
 
