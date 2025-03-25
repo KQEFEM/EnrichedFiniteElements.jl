@@ -3,11 +3,11 @@ using ..BasisFunctions  # Or import BasisFunctions as basis
 
 export all
 
-function time_enrichment_wrapper(v, f, omega)
+function time_enrichment_wrapper(v, f, omega,t0::Real)
     x = v[1]
     y = v[2]
     z = v[3]
-    return f(x, y, z, omega)
+    return f(x, y, z, omega,t0)
 end
 
 function space_enrichment_wrapper(v, f, A_val, B_val, C_val)

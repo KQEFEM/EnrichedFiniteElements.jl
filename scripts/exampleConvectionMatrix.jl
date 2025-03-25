@@ -29,7 +29,7 @@ wave_y = 0
 ansatz_wave = wave_func.create_wavenumbers(wave_x, wave_y)
 test_ansatz = wave_func.create_wavenumbers(wave_x, wave_y)
 wavenumbers_ansatz, wavenumbers_test =
-    wave_func.wavenumber_creation(ansatz_wave, test_ansatz, 2)
+    wave_func.wavenumber_creation(ansatz_wave, test_ansatz, Number_of_Frequencies_per_Wavenumber = 2, time_enrichment_only = true)
 
 idx_wave_ansatz = collect(1:size(wavenumbers_ansatz, 1))
 idx_wave_test = collect(1:size(wavenumbers_test, 1))
@@ -56,4 +56,21 @@ mass, conv = matrix_comp.compute_sparse_matrix(
 
 array = matrix_comp.convert_sparse_cell_to_array(conv)
 
-exact = spzeros(size(array, 1), size(array, 2))
+# exact = spzeros(size(array, 1), size(array, 2))
+
+using DelimitedFiles
+using SparseArrays
+
+# Load the data from the text file
+data = readdlm("test/testdata/ConvectionDt_time.txt")
+
+# Extract row indices, column indices, and values
+rows = Int.(data[:, 1])
+cols = Int.(data[:, 2])
+vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
+
+# Reconstruct the sparse matrix
+exact = sparse(rows, cols, vals);
+
+println(norm((array - transpose(exact))))
+

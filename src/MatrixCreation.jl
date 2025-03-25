@@ -110,8 +110,7 @@ function compute_sparse_matrix(
 
     end
 
-    println(mass_bool)
-    println(convection_bool)
+
     @views for (idx, ii) in enumerate(connectivity_matrix)
         #! This can be parallelised but it needs splitting into unique columns wrt to wave-pair 
 
@@ -128,13 +127,14 @@ function compute_sparse_matrix(
         grads_grads_dx = ddx .^ 2
         grads_grads_dy = ddy .^ 2
 
-        upper_bounds = [1.0, 1.0, 1.0] # time integral is a dummy variable here
-        lower_bounds = [-1.0, -1.0, 0.0] # time integral is a dummy variable here
-
-
+      
         cell_idx = LinearIndices(indexing_array)[ii[1][1][1], ii[1][1][2]] # this grabs the tuple ( - , - )
 
         if mass_bool == true
+            upper_bounds = [1.0, 1.0, 1.0] # time integral is a dummy variable here
+            lower_bounds = [-1.0, -1.0, 0.0] # time integral is a dummy variable here
+    
+    
             mass_sparse_array = create_components_mass_matrix(
                 mass_sparse_array,
                 cell_idx,
@@ -152,7 +152,11 @@ function compute_sparse_matrix(
             )
         end
         if convection_bool == true
-            pdtq_loc, _ = integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega)
+            upper_bounds = [1.0, 1.0,dt] 
+            lower_bounds = [-1.0, -1.0, 0.0] 
+    
+    
+            pdtq_loc, _ = integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega,t0,tri_area)
 
             pDtq_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= pdtq_loc
         end
@@ -215,7 +219,8 @@ function create_components_mass_matrix(
 end
 end
 
-
+#! # For check the matlab codes
+# dt =0.1
 # nodes = [ 0.0       0.0
 # 1.0       0.0
 # 1.0       1.0
@@ -228,6 +233,7 @@ end
 # 0.375     0.375
 # 0.647917  0.64375
 # 0.71875   0.28125]
+# nodes = [nodes, [1:size(nodes,1)].']
 # connectivity = [  6   3  11
 # 8   1  10
 # 1   5  10
@@ -242,6 +248,9 @@ end
 # 10   5  12
 # 11  10  12
 # 7   9  11]
+# Connectivities = {Connectivity_Wavenumbers, connectivity,...
+# connectivity};
+#  Original_nodes_index = nodes, Periodic_Nodes = nodes
 
 # matrix_connectivity_matrix = [
 #     0.0312 0 0 0 0.0078 0 0 0.0078 0 0.0156 0 0

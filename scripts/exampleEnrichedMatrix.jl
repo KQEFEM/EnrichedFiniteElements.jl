@@ -107,3 +107,12 @@ Mass_matlab = sparse(rows, cols, vals);
 
 println(norm((final_matrix - conj(Mass_matlab))))
 
+
+
+
+
+# Find the index of the row containing exactly [0.0, 0.0]
+row_index = findfirst(row -> all(row .== [0.0, 0.0]), eachrow(wavenumbers_ansatz[:,1:2]))
+
+# Print the result (1-based index)
+println("Row location: ", row_index)

@@ -83,6 +83,7 @@ function wavenumber_creation(
     end
     if time_enrichment_only == true
         wavenumber_frequency_matrix_ansatz[:,1:2] .= 0
+        wavenumber_frequency_matrix_test[:,1:2] .= 0
     end
     wavenumber_frequency_matrix_ansatz = normalize_zeros(wavenumber_frequency_matrix_ansatz)
     wavenumber_frequency_matrix_test = normalize_zeros(wavenumber_frequency_matrix_test)

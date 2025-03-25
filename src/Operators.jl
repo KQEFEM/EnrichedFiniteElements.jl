@@ -21,6 +21,8 @@ function pDtq(
     B_val::Float64,
     C_val::Float64,
     omega::Vector{Float64},
+    t0::Real,
+    triangle_area::Float64
 )
 
     function integrand(v)
@@ -34,21 +36,23 @@ function pDtq(
             B_val,
             C_val,
         ) # Pass vector, call enrich_space
+        omega_diff = omega[1] - omega[2]
         time_enrichment = help.time_enrichment_wrapper(
             [(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z],
             basis.enrichment_time,
-            diff(omega)[1],
+            omega_diff,# diff(omega)[1],
+            t0,
         ) # Pass vector, call enrichment_time
         hat_ansatz =
             help.hat_wrapper([(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
         hat_test = help.hat_wrapper([(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
 
-        return 1 / 4 *
+        return triangle_area * 1 / 4 *
                (1 - x) *
                space_enrichment *
                time_enrichment *
                hat_ansatz *
-               (omega[2] * hat_test')  # Multiply the RESULTS
+               (-im*omega[2] * hat_test')  # Multiply the RESULTS
     end
     integral_result, abs_error = hcubature(integrand, lower_bounds, upper_bounds) # Use integrand
     return integral_result, abs_error
