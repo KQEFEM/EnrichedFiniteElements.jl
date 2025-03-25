@@ -78,12 +78,11 @@ function compute_sparse_matrix(
     wavenumbers_ansatz,
     wavenumbers_test,
     integrator,
-    dt,
+    dt; #? This allows me to use keyword arguments 
     t_jump = 0.0,
     t0 = 0.0,
     mass_bool::Bool = false,
     convection_bool::Bool = false,
-    test_bool::Bool = true,
 )
     """
     This will create the matrices based on the booleon's given. 
@@ -94,7 +93,15 @@ function compute_sparse_matrix(
     connectivity_matrix: joint connectivity with wavenumbers and nodes
 
     """
-    if test_bool == true | mass_bool == true
+    indexing_array = Array{SparseMatrixCSC{ComplexF64,Int64}}(
+        undef,
+        all_pairs[end][1],
+        all_pairs[end][2],
+    ) #! This is simply for the for loop
+    mass_sparse_array = nothing # Initialize outside the if block
+    pDtq_array = nothing      # Initialize outside the if block
+
+    if mass_bool == true
         mass_sparse_array = sparse_matrix_creation(all_pairs, nodes)
     end
     if convection_bool == true
@@ -102,15 +109,13 @@ function compute_sparse_matrix(
         #! There will be tohers to add also
 
     end
-    if convection_bool == true | mass_bool == true
-        test_bool == false
-    end
+
+    println(mass_bool)
+    println(convection_bool)
     @views for (idx, ii) in enumerate(connectivity_matrix)
         #! This can be parallelised but it needs splitting into unique columns wrt to wave-pair 
-        cell_idx = LinearIndices(mass_sparse_array)[ii[1][1][1], ii[1][1][2]] # this grabs the tuple ( - , - )
 
         triangle_nodes, triangle_connectivity = nodal_transformations(ii, nodes)
-
         kx_kkx, ky_kky, omega, A, B, C = enrichment_transformations(
             ii,
             wavenumbers_ansatz,
@@ -126,24 +131,31 @@ function compute_sparse_matrix(
         upper_bounds = [1.0, 1.0, 1.0] # time integral is a dummy variable here
         lower_bounds = [-1.0, -1.0, 0.0] # time integral is a dummy variable here
 
-        mass_loc, _ = integrator.mass_jump(
-            upper_bounds,
-            lower_bounds,
-            A,
-            B,
-            C,
-            omega,
-            t_jump,
-            dt,
-            t0,
-            tri_area,
-        )
 
-        pdtq_loc, _ = integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega)
+        cell_idx = LinearIndices(indexing_array)[ii[1][1][1], ii[1][1][2]] # this grabs the tuple ( - , - )
 
-        mass_sparse_array[cell_idx][triangle_connectivity, triangle_connectivity] .+=
-            mass_loc
-        pDtq_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= pdtq_loc
+        if mass_bool == true
+            mass_sparse_array = create_components_mass_matrix(
+                mass_sparse_array,
+                cell_idx,
+                triangle_connectivity,
+                upper_bounds,
+                lower_bounds,
+                A,
+                B,
+                C,
+                omega,
+                t_jump,
+                dt,
+                t0,
+                tri_area,
+            )
+        end
+        if convection_bool == true
+            pdtq_loc, _ = integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega)
+
+            pDtq_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= pdtq_loc
+        end
     end
     # mass_sparse_array = reshape(mass_sparse_array,sqrt(idx),:)
     return mass_sparse_array, pDtq_array
@@ -160,6 +172,46 @@ function convert_sparse_cell_to_array(
     )
 
 
+end
+
+function create_components_mass_matrix(
+    mass_sparse_array::Array{SparseMatrixCSC{ComplexF64,Int64}},
+    cell_idx::Int,
+    triangle_connectivity::SubArray{
+        Int64,
+        1,
+        Matrix{Int64},
+        Tuple{Int64,Base.Slice{Base.OneTo{Int64}}},
+        true,
+    },
+    upper_bounds::Vector{Float64},
+    lower_bounds::Vector{Float64},
+    A::Float64,
+    B::Float64,
+    C::Float64,
+    omega::Vector{Float64},
+    t_jump::Float64,
+    dt::Float64,
+    t0::Float64,
+    tri_area::Float64,
+)::Array{SparseMatrixCSC{ComplexF64,Int64}}
+    """ 
+    This creates the components for the mass matrix. It does not assemble mass matrix. 
+    """
+    mass_loc, _ = integrator.mass_jump(
+        upper_bounds,
+        lower_bounds,
+        A,
+        B,
+        C,
+        omega,
+        t_jump,
+        dt,
+        t0,
+        tri_area,
+    )
+    mass_sparse_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= mass_loc
+    return mass_sparse_array
 end
 end
 

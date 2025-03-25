@@ -42,13 +42,18 @@ result = wave_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)
 wave_node_pairs = result
 dt = 0.1
 
-compute_sparse_matrix(
+using Revise
+mass, conv = matrix_comp.compute_sparse_matrix(
     all_pairs,
     nodes,
-    connectivity_matrix,
+    wave_node_pairs,
     wavenumbers_ansatz,
     wavenumbers_test,
     integrator,
     dt,
-    convection_bool = True,
+    convection_bool = true,
 )
+
+array = matrix_comp.convert_sparse_cell_to_array(conv)
+
+exact = spzeros(size(array, 1), size(array, 2))
