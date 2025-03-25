@@ -34,6 +34,7 @@ function setup_test_environment(;
     wave_x::Int64 = 0,
     wave_y::Int64 = 0,
     zero_frequencies::Bool = false,
+    time_enrichment_only::Bool = false,
 )
     """
     zero_frequencies : bool: sets the frequencies to be 0
@@ -53,10 +54,10 @@ function setup_test_environment(;
     test_ansatz = wave_func.create_wavenumbers(wave_x, wave_y)
     if zero_frequencies == false
         wavenumbers_ansatz, wavenumbers_test =
-            wave_func.wavenumber_creation(ansatz_wave, test_ansatz, 2)
+            wave_func.wavenumber_creation(ansatz_wave, test_ansatz, Number_of_Frequencies_per_Wavenumber = 2,time_enrichment_only = time_enrichment_only)
     else
         wavenumbers_ansatz, wavenumbers_test =
-            wave_func.wavenumber_creation(ansatz_wave, test_ansatz, 1)
+            wave_func.wavenumber_creation(ansatz_wave, test_ansatz, Number_of_Frequencies_per_Wavenumber = 1,time_enrichment_only = time_enrichment_only)
     end
 
     idx_wave_ansatz = collect(1:size(wavenumbers_ansatz, 1))
@@ -238,8 +239,8 @@ end
             all_pairs,
             idx_connectivity,
             wave_node_pairs = setup_test_environment(wave_x = 0, wave_y = 0)
-
-            _, = matrix_comp.compute_sparse_matrix(
+            print(wavenumbers_ansatz)
+            _, conv= matrix_comp.compute_sparse_matrix(
                 all_pairs,
                 nodes,
                 wave_node_pairs,
@@ -250,9 +251,42 @@ end
                 convection_bool = true,
             )
             array = matrix_comp.convert_sparse_cell_to_array(conv)
-
             @test isequal(array, spzeros(size(array, 1), size(array, 2)))
 
+        end
+        @testset "pDtq EFEM Time only" begin
+            dt = 0.1
+            t0 = 0.0
+            nodes,
+            connectivity,
+            boundary_index,
+            boundary_edges,
+            wavenumbers_ansatz,
+            wavenumbers_test,
+            idx_wave_ansatz,
+            idx_wave_test,
+            all_pairs,
+            idx_connectivity,
+            wave_node_pairs = setup_test_environment(wave_x = 1, wave_y = 1,time_enrichment_only = true)
+
+            _, conv= matrix_comp.compute_sparse_matrix(
+                all_pairs,
+                nodes,
+                wave_node_pairs,
+                wavenumbers_ansatz,
+                wavenumbers_test,
+                integrator,
+                dt,
+                convection_bool = true,
+            )
+            array = matrix_comp.convert_sparse_cell_to_array(conv)
+            exact_matrix =
+            transpose(load_matlab_matrix("test/testdata/ConvectionDt_time.txt")) #! This transpose is simply as the matlab code orders in a differnet way
+            println(norm(exact_matrix))
+            println(norm(array))
+            @test isapprox(norm(real(array - exact_matrix)), 1.9900648112369652e-9)
+
+            # 2.359590136507269e-8
         end
     end
 
