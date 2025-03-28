@@ -101,6 +101,7 @@ function compute_sparse_matrix(
     mass_sparse_array = nothing # Initialize outside the if block
     pDtq_array = nothing      # Initialize outside the if block
     vDxeta_array = nothing
+    vDyeta_array = nothing
     if mass_bool == true
         mass_sparse_array = sparse_matrix_creation(all_pairs, nodes)
     end
@@ -108,6 +109,7 @@ function compute_sparse_matrix(
         pDtq_array = sparse_matrix_creation(all_pairs, nodes)
         #! There will be tohers to add also
         vDxeta_array = sparse_matrix_creation(all_pairs, nodes)
+        vDyeta_array = sparse_matrix_creation(all_pairs, nodes)
 
     end
 
@@ -123,10 +125,9 @@ function compute_sparse_matrix(
             triangle_nodes,
         )
 
-        tri_area, ddx, ddy =
+        tri_area, gradients =
             transformations.Gradients_Larson(triangle_nodes[:, 1], triangle_nodes[:, 2])
-        grads_grads_dx = ddx .^ 2
-        grads_grads_dy = ddy .^ 2
+        
 
 
         cell_idx = LinearIndices(indexing_array)[ii[1][1][1], ii[1][1][2]] # this grabs the tuple ( - , - )
@@ -166,7 +167,7 @@ function compute_sparse_matrix(
             omega,
             dt,
             t0,
-            ddx,
+            gradients,
             wave_test_loc,
             tri_area,
         )
@@ -247,7 +248,7 @@ function create_components_convection_matrix(
     dt::Float64,
     t0::Float64,
     
-    gradients::Matrix{Float64},
+    gradients::Tuple{Matrix{Int64}, Matrix{Int64}},
 
     test_wavenumber::Vector{Float64},
     tri_area::Float64,
