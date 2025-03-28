@@ -170,8 +170,6 @@ function compute_sparse_matrix(
             wave_test_loc,
             tri_area,
         )
-        pDtq_array = permutedims(pDtq_array, (2,1))
-        vDxeta_array = permutedims(vDxeta_array, (2,1)) #!There is a missing transpose somewhere in the basis operations
         end
     end
     # mass_sparse_array = reshape(mass_sparse_array,sqrt(idx),:)
