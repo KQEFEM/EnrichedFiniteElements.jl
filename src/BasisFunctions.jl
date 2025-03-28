@@ -49,9 +49,9 @@ function grads_matrix(
     """
   
 
-    grad_matrix = transpose(grad_matrix)
+    # grad_matrix = transpose(grad_matrix)
     rows,cols = size(grad_matrix)
-    if cols != 3 || rows != 1
+    if cols != 1 || rows != 3
         error("Input matrix must be 3x1.")
     end
     return grad_matrix
