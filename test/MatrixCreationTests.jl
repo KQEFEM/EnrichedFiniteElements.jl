@@ -43,7 +43,7 @@ function setup_test_environment(;
     """
     zero_frequencies : bool: sets the frequencies to be 0
     """
-    
+
 
     nodes = mesh.nodes
     connectivity = mesh.connectivity
@@ -138,11 +138,7 @@ end
 
             array = matrix_comp.convert_sparse_cell_to_array(cell[1])
 
-            @test isapprox(
-                norm(real(array - matrix)),
-                0.00022378579972373314,
-                atol = 1e-3,
-            ) # This is with the spatial step, dx
+            @test isapprox(norm(real(array - matrix)), 0.00022378579972373314, atol = 1e-3) # This is with the spatial step, dx
             @test isapprox(norm(imag(array[1])), 0.0, atol = 1e-12) # Ensures that the standard FEM method doesn't produce imaginary numbers 
 
         end
@@ -176,12 +172,13 @@ end
                 mass_bool = true,
                 convection_bool = false,
             )
-       
-            
+
+
             array = matrix_comp.convert_sparse_cell_to_array(cell[1])
-            exact_matrix = 
-                conj(load_matlab_matrix("test/testdata/MassMatrixEnriched_noFrequencies.txt"))
-             #! This conjudate is simply as the matlab code orders in a differnet way
+            exact_matrix = conj(
+                load_matlab_matrix("test/testdata/MassMatrixEnriched_noFrequencies.txt"),
+            )
+            #! This conjudate is simply as the matlab code orders in a differnet way
 
             @test isapprox(norm(array - exact_matrix), 3.984715840345388e-7) # This is with the spatial step, dx
             @test isapprox(norm(real(array - exact_matrix)), 2.92067550635342e-7)
@@ -258,8 +255,8 @@ end
                 dt,
                 convection_bool = true,
             )
-  pDtq_cell = convection_cell[1]
-pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enrichments for julia to match MATLAB
+            pDtq_cell = convection_cell[1]
+            pDtq_cell = permutedims(pDtq_cell, (2, 1)) #!This fixes the ordering of the enrichments for julia to match MATLAB
 
             array = matrix_comp.convert_sparse_cell_to_array(pDtq_cell)
 
@@ -292,15 +289,14 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
                 dt,
                 convection_bool = true,
             )
-  pDtq_cell = convection_cell[1]
-pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enrichments for julia to match MATLAB
+            pDtq_cell = convection_cell[1]
+            pDtq_cell = permutedims(pDtq_cell, (2, 1)) #!This fixes the ordering of the enrichments for julia to match MATLAB
 
             array = matrix_comp.convert_sparse_cell_to_array(pDtq_cell)
-            exact_matrix =
-               (load_matlab_matrix("test/testdata/ConvectionDt_time.txt")) 
-                @test isapprox(norm((array - exact_matrix)), 2.3595901292942768e-8)
+            exact_matrix = (load_matlab_matrix("test/testdata/ConvectionDt_time.txt"))
+            @test isapprox(norm((array - exact_matrix)), 2.3595901292942768e-8)
 
-                @test isapprox(norm(imag(array - exact_matrix)), 2.3511831062368027e-8)
+            @test isapprox(norm(imag(array - exact_matrix)), 2.3511831062368027e-8)
 
             @test isapprox(norm(real(array - exact_matrix)), 1.9900648032073808e-9)
 
@@ -332,16 +328,15 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
                 dt,
                 convection_bool = true,
             )
-            
-  pDtq_cell = convection_cell[1]
-pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enrichments for julia to match MATLAB
+
+            pDtq_cell = convection_cell[1]
+            pDtq_cell = permutedims(pDtq_cell, (2, 1)) #!This fixes the ordering of the enrichments for julia to match MATLAB
 
             array = matrix_comp.convert_sparse_cell_to_array(pDtq_cell)
-            exact_matrix =
-                (load_matlab_matrix("test/testdata/ConvectionDt_space_time.txt")) 
-                @test isapprox(norm((array - exact_matrix)), 8.945366854027598e-8)
+            exact_matrix = (load_matlab_matrix("test/testdata/ConvectionDt_space_time.txt"))
+            @test isapprox(norm((array - exact_matrix)), 8.945366854027598e-8)
 
-                @test isapprox(norm(imag(array - exact_matrix)), 6.459786881101117e-8)
+            @test isapprox(norm(imag(array - exact_matrix)), 6.459786881101117e-8)
 
             @test isapprox(norm(real(array - exact_matrix)), 6.187951325268306e-8)
 
@@ -363,31 +358,30 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
             wave_node_pairs =
                 setup_test_environment(wave_x = 0, wave_y = 0, time_enrichment_only = false)
 
-                _, convection_cell = matrix_comp.compute_sparse_matrix(
-                    all_pairs,
-                    nodes,
-                    wave_node_pairs,
-                    wavenumbers_ansatz,
-                    wavenumbers_test,
-                    integrator,
-                    dt,
-                    convection_bool = true,
-                )
+            _, convection_cell = matrix_comp.compute_sparse_matrix(
+                all_pairs,
+                nodes,
+                wave_node_pairs,
+                wavenumbers_ansatz,
+                wavenumbers_test,
+                integrator,
+                dt,
+                convection_bool = true,
+            )
 
-              vDxeta_cell = convection_cell[2]
+            vDxeta_cell = convection_cell[2]
 
-                vDxeta_cell = permutedims(vDxeta_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
-                array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell)
+            vDxeta_cell = permutedims(vDxeta_cell, (2, 1)) #!There is a missing transpose somewhere in the basis operations
+            array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell)
 
-                exact_matrix =
-                (load_matlab_matrix("test/testdata/ConvectionDX_FEM.txt")) 
-                @test isapprox(norm((array - exact_matrix)), 1.3442648471406098e-13)
+            exact_matrix = (load_matlab_matrix("test/testdata/ConvectionDX_FEM.txt"))
+            @test isapprox(norm((array - exact_matrix)), 1.3442648471406098e-13)
 
-                @test isapprox(norm(real(array - exact_matrix)), 1.3442648471406098e-13)
+            @test isapprox(norm(real(array - exact_matrix)), 1.3442648471406098e-13)
 
             @test isequal(norm(imag(array - exact_matrix)), 0.0)
 
-               
+
         end
         @testset "v_nabla_q Time Enriched" begin
             dt = 0.1
@@ -405,34 +399,33 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
             wave_node_pairs =
                 setup_test_environment(wave_x = 1, wave_y = 1, time_enrichment_only = true)
 
-                _, convection_cell = matrix_comp.compute_sparse_matrix(
-                    all_pairs,
-                    nodes,
-                    wave_node_pairs,
-                    wavenumbers_ansatz,
-                    wavenumbers_test,
-                    integrator,
-                    dt,
-                    convection_bool = true,
-                )
+            _, convection_cell = matrix_comp.compute_sparse_matrix(
+                all_pairs,
+                nodes,
+                wave_node_pairs,
+                wavenumbers_ansatz,
+                wavenumbers_test,
+                integrator,
+                dt,
+                convection_bool = true,
+            )
 
-              vDxeta_cell = convection_cell[2]
+            vDxeta_cell = convection_cell[2]
 
-                vDxeta_cell = permutedims(vDxeta_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
-                array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell)
+            vDxeta_cell = permutedims(vDxeta_cell, (2, 1)) #!There is a missing transpose somewhere in the basis operations
+            array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell)
 
-                exact_matrix =
-                (load_matlab_matrix("test/testdata/ConvectionDX_time.txt")) 
+            exact_matrix = (load_matlab_matrix("test/testdata/ConvectionDX_time.txt"))
 
-                @test isapprox(norm((array - exact_matrix)), 6.715278246898072e-13)
+            @test isapprox(norm((array - exact_matrix)), 6.715278246898072e-13)
 
-                @test isapprox(norm(real(array - exact_matrix)), 6.694169592754642e-13)
+            @test isapprox(norm(real(array - exact_matrix)), 6.694169592754642e-13)
 
-                @test isapprox(norm(imag(array - exact_matrix)), 5.320295073598745e-14)
-                @test isapprox(norm(diag(array - exact_matrix)), 1.285253769296312e-13)
+            @test isapprox(norm(imag(array - exact_matrix)), 5.320295073598745e-14)
+            @test isapprox(norm(diag(array - exact_matrix)), 1.285253769296312e-13)
 
 
-               
+
         end
 
         @testset "v_nabla_q Space-Time Enriched" begin
@@ -451,34 +444,33 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
             wave_node_pairs =
                 setup_test_environment(wave_x = 1, wave_y = 1, time_enrichment_only = false)
 
-                _, convection_cell = matrix_comp.compute_sparse_matrix(
-                    all_pairs,
-                    nodes,
-                    wave_node_pairs,
-                    wavenumbers_ansatz,
-                    wavenumbers_test,
-                    integrator,
-                    dt,
-                    convection_bool = true,
-                )
+            _, convection_cell = matrix_comp.compute_sparse_matrix(
+                all_pairs,
+                nodes,
+                wave_node_pairs,
+                wavenumbers_ansatz,
+                wavenumbers_test,
+                integrator,
+                dt,
+                convection_bool = true,
+            )
 
-              vDxeta_cell = convection_cell[2]
+            vDxeta_cell = convection_cell[2]
 
-                vDxeta_cell = permutedims(vDxeta_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
-                array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell)
+            vDxeta_cell = permutedims(vDxeta_cell, (2, 1)) #!There is a missing transpose somewhere in the basis operations
+            array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell)
 
-                exact_matrix =
-                (load_matlab_matrix("test/testdata/ConvectionDX_space_time.txt")) 
-                
-                @test isapprox(norm((array - exact_matrix)), 8.594550234390262e-8)
+            exact_matrix = (load_matlab_matrix("test/testdata/ConvectionDX_space_time.txt"))
 
-                @test isapprox(norm(real(array - exact_matrix)), 6.211649103163213e-8)
+            @test isapprox(norm((array - exact_matrix)), 8.594550234390262e-8)
 
-                @test isapprox(norm(imag(array - exact_matrix)), 5.939840835462623e-8)
-                @test isapprox(norm(diag(array - exact_matrix)), 1.154607276802081e-8)
+            @test isapprox(norm(real(array - exact_matrix)), 6.211649103163213e-8)
+
+            @test isapprox(norm(imag(array - exact_matrix)), 5.939840835462623e-8)
+            @test isapprox(norm(diag(array - exact_matrix)), 1.154607276802081e-8)
 
 
-               
+
         end
     end
 

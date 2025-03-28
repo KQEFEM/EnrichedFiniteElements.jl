@@ -130,7 +130,7 @@ function compute_sparse_matrix(
         #! This can be parallelised but it needs splitting into unique columns wrt to wave-pair 
 
         triangle_nodes, triangle_connectivity = nodal_transformations(ii, nodes)
-        _, wave_test_loc , _, _, omega, A, B, C = enrichment_transformations(
+        _, wave_test_loc, _, _, omega, A, B, C = enrichment_transformations(
             ii,
             wavenumbers_ansatz,
             wavenumbers_test,
@@ -139,7 +139,7 @@ function compute_sparse_matrix(
 
         tri_area, gradients =
             transformations.Gradients_Larson(triangle_nodes[:, 1], triangle_nodes[:, 2])
-        
+
 
         cell_idx = LinearIndices(indexing_array)[ii[1][1][1], ii[1][1][2]] # this grabs the tuple ( - , - )
 
@@ -182,26 +182,26 @@ function compute_sparse_matrix(
         if convection_bool == true
             # println(size(ddx))
             # println(ddx)
-            pDtq_cell, vDxeta_cell,vDyeta_cell =  create_components_convection_matrix(
-            pDtq_cell,
-            vDxeta_cell,
-            vDyeta_cell,
-            cell_idx,
-            triangle_connectivity,
-            A,
-            B,
-            C,
-            omega,
-            dt,
-            t0,
-            gradients,
-            wave_test_loc,
-            tri_area,
-        )
+            pDtq_cell, vDxeta_cell, vDyeta_cell = create_components_convection_matrix(
+                pDtq_cell,
+                vDxeta_cell,
+                vDyeta_cell,
+                cell_idx,
+                triangle_connectivity,
+                A,
+                B,
+                C,
+                omega,
+                dt,
+                t0,
+                gradients,
+                wave_test_loc,
+                tri_area,
+            )
         end
     end
     mass_cell = (mass_cell_t1, mass_cell_t0)
-    convection_cell = (pDtq_cell, vDxeta_cell,vDyeta_cell)
+    convection_cell = (pDtq_cell, vDxeta_cell, vDyeta_cell)
 
     # mass_cell_t1 = reshape(mass_cell_t1,sqrt(idx),:)
     return mass_cell, convection_cell
@@ -278,30 +278,49 @@ function create_components_convection_matrix(
     omega::Vector{Float64},
     dt::Float64,
     t0::Float64,
-    
-    gradients::Tuple{Matrix{Float64}, Matrix{Float64}},
-
+    gradients::Tuple{Matrix{Float64},Matrix{Float64}},
     test_wavenumber::Vector{Float64},
     tri_area::Float64,
 )#::(Array{SparseMatrixCSC{ComplexF64,Int64}},Array{SparseMatrixCSC{ComplexF64,Int64}})
-"""
-test_wavenumber
-"""
-            upper_bounds = [1.0, 1.0, dt]
-            lower_bounds = [-1.0, -1.0, 0.0]
-            ddx = gradients[1]
-            ddy = gradients[2]
+    """
+    test_wavenumber
+    """
+    upper_bounds = [1.0, 1.0, dt]
+    lower_bounds = [-1.0, -1.0, 0.0]
+    ddx = gradients[1]
+    ddy = gradients[2]
 
-            pdtq_loc, _ =
-                integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega, t0, tri_area)
+    pdtq_loc, _ = integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega, t0, tri_area)
 
-            pDtq_cell[cell_idx][triangle_connectivity, triangle_connectivity] .+= pdtq_loc
-            vDxeta_loc, _ = integrator.v_nabla_q(upper_bounds, lower_bounds, A, B, C, omega, ddx, test_wavenumber[1], t0, tri_area)
-            vDxeta_cell[cell_idx][triangle_connectivity, triangle_connectivity] .+= vDxeta_loc
-            vDyeta_loc, _ = integrator.v_nabla_q(upper_bounds, lower_bounds, A, B, C, omega, ddy, test_wavenumber[1], t0, tri_area)
-            vDyeta_cell[cell_idx][triangle_connectivity, triangle_connectivity] .+= vDyeta_loc
+    pDtq_cell[cell_idx][triangle_connectivity, triangle_connectivity] .+= pdtq_loc
+    vDxeta_loc, _ = integrator.v_nabla_q(
+        upper_bounds,
+        lower_bounds,
+        A,
+        B,
+        C,
+        omega,
+        ddx,
+        test_wavenumber[1],
+        t0,
+        tri_area,
+    )
+    vDxeta_cell[cell_idx][triangle_connectivity, triangle_connectivity] .+= vDxeta_loc
+    vDyeta_loc, _ = integrator.v_nabla_q(
+        upper_bounds,
+        lower_bounds,
+        A,
+        B,
+        C,
+        omega,
+        ddy,
+        test_wavenumber[1],
+        t0,
+        tri_area,
+    )
+    vDyeta_cell[cell_idx][triangle_connectivity, triangle_connectivity] .+= vDyeta_loc
 
-            return pDtq_cell, vDxeta_cell, vDyeta_cell
+    return pDtq_cell, vDxeta_cell, vDyeta_cell
 end
 end
 

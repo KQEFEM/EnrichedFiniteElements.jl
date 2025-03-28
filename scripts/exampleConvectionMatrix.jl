@@ -47,7 +47,7 @@ wave_node_pairs = result
 dt = 0.1
 
 using Revise
- _, convection_cell = matrix_comp.compute_sparse_matrix(
+_, convection_cell = matrix_comp.compute_sparse_matrix(
     all_pairs,
     nodes,
     wave_node_pairs,
@@ -59,8 +59,8 @@ using Revise
 )
 vDxeta_cell = convection_cell[2]
 pDtq_cell = convection_cell[1]
-vDxeta_cell = permutedims(vDxeta_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
-pDtq_cell = permutedims(pDtq_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
+vDxeta_cell = permutedims(vDxeta_cell, (2, 1)) #!There is a missing transpose somewhere in the basis operations
+pDtq_cell = permutedims(pDtq_cell, (2, 1)) #!There is a missing transpose somewhere in the basis operations
 
 pDtq_array = matrix_comp.convert_sparse_cell_to_array(pDtq_cell);
 vDxeta_array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell);
@@ -81,12 +81,12 @@ vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
 pDtq_exact = sparse(rows, cols, vals);
 
 println(norm((pDtq_array - (pDtq_exact))))
-println(norm(imag(pDtq_array - (pDtq_exact) )))
-println(norm(real(pDtq_array - (pDtq_exact) )))
+println(norm(imag(pDtq_array - (pDtq_exact))))
+println(norm(real(pDtq_array - (pDtq_exact))))
 pDtq_array[1]
 pDtq_exact[1]
-pDtq_array[1,13]
-pDtq_exact[13,1]
+pDtq_array[1, 13]
+pDtq_exact[13, 1]
 ## Dx Convection 
 # Load the data from the text file
 data = readdlm("test/testdata/ConvectionDx_space_time.txt")
@@ -99,20 +99,20 @@ vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
 # Reconstruct the sparse matrix
 vDxeta_exact = (sparse(rows, cols, vals));
 
-println(norm(( vDxeta_array -  (vDxeta_exact))))
-println(norm(real( vDxeta_array -  (vDxeta_exact))))
-println(norm(imag( vDxeta_array -  (vDxeta_exact))))
+println(norm((vDxeta_array - (vDxeta_exact))))
+println(norm(real(vDxeta_array - (vDxeta_exact))))
+println(norm(imag(vDxeta_array - (vDxeta_exact))))
 
 
-println(norm(diag( vDxeta_array - ( vDxeta_exact))))
+println(norm(diag(vDxeta_array - (vDxeta_exact))))
 
 vDxeta_array[1]
 vDxeta_exact[1]
-vDxeta_array[1,17]
-vDxeta_exact[17,1]
+vDxeta_array[1, 17]
+vDxeta_exact[17, 1]
 
 
 
 
 
-vDxeta_array[1,17] - vDxeta_exact[17,1]
+vDxeta_array[1, 17] - vDxeta_exact[17, 1]

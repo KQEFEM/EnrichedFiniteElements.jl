@@ -56,7 +56,7 @@ end
     @testset "Test 1: Valid triangle" begin # Added 'begin' here
         x1 = [0.0, 1.0, 0.0]
         y1 = [0.0, 0.0, 1.0]
-        area1,gradients = transformations.Gradients_Larson(x1, y1) # Corrected function call
+        area1, gradients = transformations.Gradients_Larson(x1, y1) # Corrected function call
         b1 = gradients[1]
         c1 = gradients[2]
         @test area1 ≈ 0.5

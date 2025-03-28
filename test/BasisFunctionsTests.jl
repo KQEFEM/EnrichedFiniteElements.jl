@@ -9,7 +9,7 @@ using .BasisFunctions  # Assuming BasisFunctions.jl is in the same directory or 
         x = 0.2
         y = 0.3
         phi_val = BasisFunctions.phi(x, y)
-        @test size(phi_val) == (1,3)
+        @test size(phi_val) == (1, 3)
         # Check size
         @test phi_val == transpose([0.5; 0.2; 0.3]) # Check values (using ≈ for floating-point comparison)
     end

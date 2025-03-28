@@ -51,8 +51,7 @@ function pDtq(
                (1 - x) *
                space_enrichment *
                time_enrichment *
-               hat_ansatz .*
-               (-im * omega[2] .* hat_test')  # Multiply the RESULTS
+               hat_ansatz .* (-im * omega[2] .* hat_test')  # Multiply the RESULTS
     end
     integral_result, abs_error = hcubature(integrand, lower_bounds, upper_bounds) # Use integrand
     return integral_result, abs_error
