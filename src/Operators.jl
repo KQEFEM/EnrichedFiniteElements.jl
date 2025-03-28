@@ -51,8 +51,8 @@ function pDtq(
                (1 - x) *
                space_enrichment *
                time_enrichment *
-               hat_ansatz *
-               (-im * omega[2] * hat_test')  # Multiply the RESULTS
+               hat_ansatz .*
+               (-im * omega[2] .* hat_test')  # Multiply the RESULTS
     end
     integral_result, abs_error = hcubature(integrand, lower_bounds, upper_bounds) # Use integrand
     return integral_result, abs_error
@@ -85,10 +85,12 @@ function v_nabla_q(
             B_val,
             C_val,
         ) # Pass vector, call enrich_space
+        omega_diff = omega[1] - omega[2]
+
         time_enrichment = help.time_enrichment_wrapper(
             [(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z],
             basis.enrichment_time,
-            diff(omega)[1],
+            omega_diff,
             t0,
         ) # Pass vector, call enrichment_time
         hat_ansatz =
@@ -102,7 +104,7 @@ function v_nabla_q(
 
         return triangle_area * 1 / 4 *
                (1 - x) *
-               (hat_ansatz .* grads - 1im * hat_ansatz * hat_test' * wavenumber) *
+               (hat_ansatz .* grads - im * hat_ansatz .* hat_test' * wavenumber) *
                space_enrichment *
                time_enrichment
     end

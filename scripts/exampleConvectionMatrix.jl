@@ -24,8 +24,8 @@ connectivity = mesh.connectivity
 boundary_index = mesh.boundary_idx
 boundary_edges = mesh.boundary_edges
 
-wave_x = 0
-wave_y = 0
+wave_x = 1
+wave_y = 1
 ansatz_wave = wave_func.create_wavenumbers(wave_x, wave_y)
 test_ansatz = wave_func.create_wavenumbers(wave_x, wave_y)
 wavenumbers_ansatz, wavenumbers_test = wave_func.wavenumber_creation(
@@ -57,17 +57,18 @@ using Revise
     dt,
     convection_bool = true,
 )
-vDxeta_array = permutedims(vDxeta_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
+vDxeta_cell = permutedims(vDxeta_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
+pDtq_cell = permutedims(pDtq_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
 
-pDtq_array = matrix_comp.convert_sparse_cell_to_array(pDtq_cell)
-vDxeta_array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell)
+pDtq_array = matrix_comp.convert_sparse_cell_to_array(pDtq_cell);
+vDxeta_array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell);
 # pDtq_exact = spzeros(size(array, 1), size(array, 2))
 
 using DelimitedFiles
 using SparseArrays
 
 # Load the data from the text file
-data = readdlm("test/testdata/ConvectionDt_space_time.txt")
+data = readdlm("test/testdata/ConvectionDt_time.txt")
 
 # Extract row indices, column indices, and values
 rows = Int.(data[:, 1])
@@ -77,11 +78,16 @@ vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
 # Reconstruct the sparse matrix
 pDtq_exact = sparse(rows, cols, vals);
 
-println(norm((pDtq_array - transpose(pDtq_exact))))
-
+println(norm((pDtq_array - (pDtq_exact))))
+println(norm(imag(pDtq_array - (pDtq_exact) )))
+println(norm(real(pDtq_array - (pDtq_exact) )))
+pDtq_array[1]
+pDtq_exact[1]
+pDtq_array[1,13]
+pDtq_exact[13,1]
 ## Dx Convection 
 # Load the data from the text file
-data = readdlm("test/testdata/ConvectionDx_FEM.txt")
+data = readdlm("test/testdata/ConvectionDx_space_time.txt")
 
 # Extract row indices, column indices, and values
 rows = Int.(data[:, 1])
@@ -89,17 +95,22 @@ cols = Int.(data[:, 2])
 vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
 
 # Reconstruct the sparse matrix
-vDxeta_exact = sparse(rows, cols, vals);
+vDxeta_exact = (sparse(rows, cols, vals));
 
-println(norm(( vDxeta_array - transpose( vDxeta_exact))))
+println(norm(( vDxeta_array -  (vDxeta_exact))))
+println(norm(real( vDxeta_array -  (vDxeta_exact))))
+println(norm(imag( vDxeta_array -  (vDxeta_exact))))
+
+
 println(norm(diag( vDxeta_array - ( vDxeta_exact))))
 
 vDxeta_array[1]
 vDxeta_exact[1]
-vDxeta_array[1,13]
-vDxeta_exact[1,13]
+vDxeta_array[1,17]
+vDxeta_exact[17,1]
 
 
 
 
 
+vDxeta_array[1,17] - vDxeta_exact[17,1]

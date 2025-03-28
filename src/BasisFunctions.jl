@@ -11,7 +11,7 @@ function phi(x::Real, y::Real, z::Real = 0.0)
         y: y-coordinate.
 
     Returns:
-        A 3x1 matrix (column vector) of the basis function values.
+        A 1x3 matrix (column vector) of the basis function values.
     """
     return transpose([1 - x - y; x; y]) #! This is where the missing transpose is - we shall see if this effects the main computation 
 end
@@ -45,7 +45,7 @@ function grads_matrix(
        grad_matrix: 3x3 matrix
 
     Returns:
-        A 3x3 matrix.
+        A 3x1 matrix.
     """
   
 
