@@ -1,6 +1,6 @@
 module TransformationFunctions
 using PolygonOps
-
+export all
 """
 Corrects the orientation of triangle nodes to ensure that triangle normals point in a consistent direction.
 
@@ -62,5 +62,18 @@ function Gradients_Larson(x, y)
     gradients = (b, c)
     return tri_area, gradients
 end
+
+function arb_triangle_to_ref(nodes)
+    x1, y1 = nodes[1, 1], nodes[1, 2]
+    x2, y2 = nodes[2, 1], nodes[2, 2]
+    x3, y3 = nodes[3, 1], nodes[3, 2]
+
+    X21 = x2 - x1
+    X31 = x3 - x1 
+    Y21 = y2 - y1
+    Y31 = y3 - y1
+
+    return X21,X31,Y21,Y31,x1,y1
+end 
 
 end
