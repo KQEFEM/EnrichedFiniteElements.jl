@@ -1,6 +1,9 @@
 module IntegrationWrappers
 using ..BasisFunctions  # Or import BasisFunctions as basis
+using ..TransformationFunctions
 
+export all
+const transformations = TransformationFunctions
 export all
 
 function time_enrichment_wrapper(v, f, omega, t0::Real)
@@ -58,5 +61,18 @@ function hat_wrap(v)
     return hat_wrapper(v, BasisFunctions.p_mat)
 end
 
+function load_term_wrapper(v,f, triangle_nodes::Matrix{Float64})
+    """ This should accept any number of arguments """
+    x = v[1]
+    y = v[2]
+    z = v[3]
+    # println(triangle_nodes)
+    # println("Hello")
+    X21,X31,Y21,Y31,X1,Y1 = transformations.arb_triangle_to_ref(triangle_nodes)
+     # Apply transformation arb ▷ -> ref triangle ∟
+     xx = X21 * x + X31 * y + X1
+     yy = Y21 * x + Y31 * y + Y1
+    return f(xx, yy, z)
+end 
 
 end

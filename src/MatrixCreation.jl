@@ -1,7 +1,6 @@
 module MatrixCreation
 using SparseArrays
 
-using HCubature
 import ..BasisFunctions as basis
 import ..Operators as op
 # import ..TransformationFunctions as transformations

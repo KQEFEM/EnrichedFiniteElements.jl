@@ -158,6 +158,51 @@ function mass_jump(
     return integral_result, abs_error
 end
 
+function load_term( upper_bounds::Vector{Float64},
+    lower_bounds::Vector{Float64},
+    A_val::Float64,
+    B_val::Float64,
+    C_val::Float64,
+    omega::Float64,
+    t0::Real,
+    triangle_area::Float64,
+    triangle_nodes::Matrix{Float64},
+    rhs_function,
+)
+
+
+ function integrand(v)
+        x = v[1]
+        y = v[2]
+        z = v[3]
+        space_enrichment = help.space_enrichment_wrapper(
+            [(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z],
+            basis.enrich_space,
+            A_val,
+            B_val,
+            C_val,
+        ) # Pass vector, call enrich_space
+     
+
+        time_enrichment = help.time_enrichment_wrapper(
+            [(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z],
+            basis.enrichment_time,
+            omega[1], #this comes from the conjugate
+            t0,
+        ) # Pass vector, call enrichment_time
+        hat_test = help.hat_wrapper([(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z], basis.phi) # Pass vector, call hat_function
+        load_term = help.load_term_wrapper([(x + 1) / 2, (1 - x) / 2 * (y + 1) / 2, z] ,rhs_function,triangle_nodes)
+
+        return triangle_area * 1 / 4 *
+               (1 - x) *
+               (load_term .* hat_test) *
+               space_enrichment *
+               time_enrichment
+    end
+    integral_result, abs_error = hcubature(integrand, lower_bounds, upper_bounds) # Use integrand
+    return integral_result, abs_error
+end
+
 # function load_term()
 #     function integrand(v)
 #         x = v[1]
