@@ -25,6 +25,9 @@ using .MeshCreation
 include("EnrichmentCreator.jl")
 using .EnrichmentCreator
 
+include("Formulation.jl")
+using .Formulation
+
 
 
 end  # module EnrichedFiniteElements
