@@ -28,7 +28,7 @@ wave_y = 1
 ansatz_wave = wave_func.create_wavenumbers(wave_x, wave_y)
 test_ansatz = wave_func.create_wavenumbers(wave_x, wave_y)
 wavenumbers_ansatz, wavenumbers_test =
-    wave_func.wavenumber_creation(ansatz_wave, test_ansatz, 2)
+    wave_func.wavenumber_creation(ansatz_wave, test_ansatz)
 
 idx_wave_ansatz = collect(1:size(wavenumbers_ansatz, 1))
 idx_wave_test = collect(1:size(wavenumbers_test, 1))
@@ -40,7 +40,8 @@ result = wave_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)
 
 wave_node_pairs = result
 dt = 0.1
-cell_sparse_zero_array_2 = matrix_comp.compute_sparse_mass_matrix(
+using Revise
+mass_cell, _ = matrix_comp.compute_sparse_matrix(
     all_pairs,
     nodes,
     wave_node_pairs,
@@ -48,19 +49,18 @@ cell_sparse_zero_array_2 = matrix_comp.compute_sparse_mass_matrix(
     wavenumbers_test,
     integrator,
     dt,
-    dt,
-    0.0,
+    t_jump = dt,
+    t0 = 0.0,
+    mass_bool = true,
 )
+mass_cell
 
 # Assemble the final large matrix without loops
 num_rows = size(cell_sparse_zero_array_2, 1)
 num_cols = size(cell_sparse_zero_array_2, 2)
 final_matrix = reduce(
     vcat,
-    [
-        reduce(hcat, [cell_sparse_zero_array_2[i, j] for j = 1:num_cols]) for
-        i = 1:num_rows
-    ],
+    [reduce(hcat, [cell_sparse_zero_array_2[i, j] for j = 1:num_cols]) for i = 1:num_rows],
 );
 
 exact_mat = [
@@ -92,6 +92,21 @@ exact_mat = [
     0.000000000000000 0.011523333568294-0.001888668887620im 0.000000000000000 0.000000000000000 0.010600531331030-0.001565045746753im 0.009977411412215-0.003882939027479im 0.000000000000000 0.000000000000000 0.000000000000000 0.009245335433152-0.003136767827467im 0.008779916473549-0.004322366957603im 0.050421595925460-0.014777582537093im
 ]
 
+Mass_matlab = [
+    0.0312 0 0 0 0.0078 0 0 0.0078 0 0.0156 0 0
+    0 0.0234 0 0 0.0059 0.0059 0 0 0 0 0 0.0117
+    0 0 0.0295 0 0 0.0073 0.0074 0 0 0 0.0148 0
+    0 0 0 0.0245 0 0 0.0061 0.0061 0.0122 0 0 0
+    0.0078 0.0059 0 0 0.0371 0 0 0 0 0.0127 0 0.0107
+    0 0.0059 0.0073 0 0 0.0362 0 0 0 0 0.0122 0.0108
+    0 0 0.0074 0.0061 0 0 0.0368 0 0.0110 0 0.0123 0
+    0.0078 0 0 0.0061 0 0 0 0.0374 0.0109 0.0126 0 0
+    0 0 0 0.0122 0 0 0.0110 0.0109 0.0531 0.0094 0.0095 0
+    0.0156 0 0 0 0.0127 0 0 0.0126 0.0094 0.0697 0.0096 0.0098
+    0 0 0.0148 0 0 0.0122 0.0123 0 0.0095 0.0096 0.0682 0.0098
+    0 0.0117 0 0 0.0107 0.0108 0 0 0 0.0098 0.0098 0.0528
+]
+
 println(norm(cell_sparse_zero_array_2[end-1, end] - conj(exact_mat)))
 
 using DelimitedFiles
@@ -109,4 +124,14 @@ vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
 Mass_matlab = sparse(rows, cols, vals);
 
 println(norm((final_matrix - conj(Mass_matlab))))
+println(norm((final_matrix - Mass_matlab)))
 
+
+
+
+
+# Find the index of the row containing exactly [0.0, 0.0]
+row_index = findfirst(row -> all(row .== [0.0, 0.0]), eachrow(wavenumbers_ansatz[:, 1:2]))
+
+# Print the result (1-based index)
+println("Row location: ", row_index)

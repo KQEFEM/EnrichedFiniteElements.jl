@@ -41,7 +41,7 @@ result = wave_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)
 
 wave_node_pairs = result
 dt = 0.1
-cell_sparse_zero_array_2 = matrix_comp.compute_sparse_mass_matrix(
+cell_sparse_zero_array_2 = matrix_comp.compute_sparse_matrix(
     all_pairs,
     nodes,
     wave_node_pairs,

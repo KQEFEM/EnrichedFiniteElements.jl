@@ -11,9 +11,9 @@ function phi(x::Real, y::Real, z::Real = 0.0)
         y: y-coordinate.
 
     Returns:
-        A 3x1 matrix (column vector) of the basis function values.
+        A 1x3 matrix (column vector) of the basis function values.
     """
-    return [1 - x - y; x; y]
+    return transpose([1 - x - y; x; y]) #! This is where the missing transpose is - we shall see if this effects the main computation 
 end
 
 function p_matrix(x::Real, y::Real, z::Real = 0)
@@ -29,7 +29,7 @@ function p_matrix(x::Real, y::Real, z::Real = 0)
     """
     phi_val = phi(x, y)
     # println(phi_val)
-    return phi_val * phi_val'  # Use * for matrix multiplication
+    return phi_val .* phi_val'  # Use * for matrix multiplication
 end
 
 function grads_matrix(
@@ -45,11 +45,14 @@ function grads_matrix(
        grad_matrix: 3x3 matrix
 
     Returns:
-        A 3x3 matrix.
+        A 3x1 matrix.
     """
+
+
+    # grad_matrix = transpose(grad_matrix)
     rows, cols = size(grad_matrix)
-    if rows != 3 || cols != 3
-        error("Input matrix must be 3x3.")
+    if cols != 1 || rows != 3
+        error("Input matrix must be 3x1.")
     end
     return grad_matrix
 end
@@ -97,7 +100,7 @@ function e_time_mass(
     return exp(1im * w * dt) * exp(-1im * ww * (t_jump - t0))
 end
 
-function enrichment_time(x::Real, y::Real, t::Real, w::Float64)
+function enrichment_time(x::Real, y::Real, t::Real, w::Float64, t0::Real)
     """
     Defines the time enrichment function for the ansatz function.
 
@@ -108,7 +111,7 @@ function enrichment_time(x::Real, y::Real, t::Real, w::Float64)
     Returns:
         A complex number.
     """
-    return exp(1im * w * t)
+    return exp(1im * w * (t - t0))
 end
 
 function e_time_test(x::Real, y::Real, t::Real, ww::Vector{Float64})

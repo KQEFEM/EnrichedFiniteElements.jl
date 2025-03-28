@@ -56,10 +56,11 @@ function Gradients_Larson(x, y)
     end
 
     # Compute gradients b and c
-    b = [y[2] - y[3]; y[3] - y[1]; y[1] - y[2]] / (2 * tri_area)
-    c = [x[3] - x[2]; x[1] - x[3]; x[2] - x[1]] / (2 * tri_area)
-
-    return tri_area, b, c
+    b = reshape([y[2] - y[3]; y[3] - y[1]; y[1] - y[2]] / (2 * tri_area), 3, 1)
+    c = reshape([x[3] - x[2]; x[1] - x[3]; x[2] - x[1]] / (2 * tri_area), 3, 1)
+    #! The reshape is to ensure it is a matrix so it dits with the numerical integration
+    gradients = (b, c)
+    return tri_area, gradients
 end
 
 end
