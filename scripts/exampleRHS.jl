@@ -17,13 +17,14 @@ domain = ((0, 1), (0, 1))
 num_nodes = 10
 
 # Create the mesh
-mesh = mesh_create.rectangle_domain(domain)
+mesh = mesh_create.rectangle_domain(domain, mesh_size = 1)
+
 
 nodes = mesh.nodes
 connectivity = mesh.connectivity
 boundary_index = mesh.boundary_idx
 boundary_edges = mesh.boundary_edges
-
+plot_mesh(nodes, connectivity)
 wave_x = 0
 wave_y = 0
 ansatz_wave = wave_func.create_wavenumbers(wave_x, wave_y)
@@ -45,7 +46,7 @@ result = wave_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)
 
 wave_node_pairs = result
 dt = 0.1
-
+dt =  9.0909e-02
 
 using Revise
 rhs_function = rhs_comp.exact_pressure_0_velocity(1.9,2.0,1.0)  # Assign the function to a variable
@@ -65,71 +66,115 @@ f1, f2x, f2y = rhs_comp.load_term_integration(
     w = 1.0
 )
 
+f1
+f1_exact =  [-1.7562e-02
+-2.0955e-02
+-2.0955e-02
+-1.7562e-02
+-3.9513e-02]
 
+f2x 
+f2x_exact = [ 1.7562e-02
+2.0955e-02
+2.0955e-02
+1.7562e-02
+3.9513e-02]
 
-
-
-vDxeta_cell = convection_cell[2]
-pDtq_cell = convection_cell[1]
-vDyeta_cell = convection_cell[3]
-vDxeta_cell = permutedims(vDxeta_cell, (2, 1)) #!There is a missing transpose somewhere in the basis operations
-pDtq_cell = permutedims(pDtq_cell, (2, 1)) #!There is a missing transpose somewhere in the basis operations
-vDyeta_cell = permutedims(vDyeta_cell, (2, 1))
-pDtq_array = matrix_comp.convert_sparse_cell_to_array(pDtq_cell);
-vDxeta_array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell);
-vDyeta_array = matrix_comp.convert_sparse_cell_to_array(vDyeta_cell);
-C = [pDtq_array vDxeta_array vDyeta_array;
-     vDxeta_array pDtq_array pDtq_array;
-     vDyeta_array pDtq_array pDtq_array]
-# pDtq_exact = spzeros(size(array, 1), size(array, 2))
+f2y 
+f2y_exact= [0]
+# vDxeta_cell = convection_cell[2]
+# pDtq_cell = convection_cell[1]
+# vDyeta_cell = convection_cell[3]
+# vDxeta_cell = permutedims(vDxeta_cell, (2, 1)) #!There is a missing transpose somewhere in the basis operations
+# pDtq_cell = permutedims(pDtq_cell, (2, 1)) #!There is a missing transpose somewhere in the basis operations
+# vDyeta_cell = permutedims(vDyeta_cell, (2, 1))
+# pDtq_array = matrix_comp.convert_sparse_cell_to_array(pDtq_cell);
+# vDxeta_array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell);
+# vDyeta_array = matrix_comp.convert_sparse_cell_to_array(vDyeta_cell);
+# C = [pDtq_array vDxeta_array vDyeta_array;
+#      vDxeta_array pDtq_array pDtq_array;
+#      vDyeta_array pDtq_array pDtq_array]
+# # pDtq_exact = spzeros(size(array, 1), size(array, 2))
 
 using DelimitedFiles
 using SparseArrays
 
-# Load the data from the text file
-data = readdlm("test/testdata/ConvectionDt_space_time.txt")
+# # Load the data from the text file
+# data = readdlm("test/testdata/ConvectionDt_space_time.txt")
 
-# Extract row indices, column indices, and values
-rows = Int.(data[:, 1])
-cols = Int.(data[:, 2])
-vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
+# # Extract row indices, column indices, and values
+# rows = Int.(data[:, 1])
+# cols = Int.(data[:, 2])
+# vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
 
-# Reconstruct the sparse matrix
-pDtq_exact = sparse(rows, cols, vals);
+# # Reconstruct the sparse matrix
+# pDtq_exact = sparse(rows, cols, vals);
 
-println(norm((pDtq_array - (pDtq_exact))))
-println(norm(imag(pDtq_array - (pDtq_exact))))
-println(norm(real(pDtq_array - (pDtq_exact))))
-pDtq_array[1]
-pDtq_exact[1]
-pDtq_array[1, 13]
-pDtq_exact[13, 1]
-## Dx Convection 
-# Load the data from the text file
-data = readdlm("test/testdata/ConvectionDx_space_time.txt")
+# println(norm((pDtq_array - (pDtq_exact))))
+# println(norm(imag(pDtq_array - (pDtq_exact))))
+# println(norm(real(pDtq_array - (pDtq_exact))))
+# pDtq_array[1]
+# pDtq_exact[1]
+# pDtq_array[1, 13]
+# pDtq_exact[13, 1]
+# ## Dx Convection 
+# # Load the data from the text file
+# data = readdlm("test/testdata/ConvectionDx_space_time.txt")
 
-# Extract row indices, column indices, and values
-rows = Int.(data[:, 1])
-cols = Int.(data[:, 2])
-vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
+# # Extract row indices, column indices, and values
+# rows = Int.(data[:, 1])
+# cols = Int.(data[:, 2])
+# vals = complex.(data[:, 3], data[:, 4])  # Combine real and imaginary parts
 
-# Reconstruct the sparse matrix
-vDxeta_exact = (sparse(rows, cols, vals));
+# # Reconstruct the sparse matrix
+# vDxeta_exact = (sparse(rows, cols, vals));
 
-println(norm((vDxeta_array - (vDxeta_exact))))
-println(norm(real(vDxeta_array - (vDxeta_exact))))
-println(norm(imag(vDxeta_array - (vDxeta_exact))))
-
-
-println(norm(diag(vDxeta_array - (vDxeta_exact))))
-
-vDxeta_array[1]
-vDxeta_exact[1]
-vDxeta_array[1, 17]
-vDxeta_exact[17, 1]
+# println(norm((vDxeta_array - (vDxeta_exact))))
+# println(norm(real(vDxeta_array - (vDxeta_exact))))
+# println(norm(imag(vDxeta_array - (vDxeta_exact))))
 
 
+# println(norm(diag(vDxeta_array - (vDxeta_exact))))
+
+# vDxeta_array[1]
+# vDxeta_exact[1]
+# vDxeta_array[1, 17]
+# vDxeta_exact[17, 1]
 
 
 
-vDxeta_array[1, 17] - vDxeta_exact[17, 1]
+
+
+# vDxeta_array[1, 17] - vDxeta_exact[17, 1]
+
+function plot_mesh(nodes, connectivity)
+    plt = plot(legend = false, aspect_ratio = :equal, grid = false, framestyle = :none)
+
+    # Plot each triangle
+    for element in eachrow(connectivity)
+        x = [
+            nodes[element[1], 1],
+            nodes[element[2], 1],
+            nodes[element[3], 1],
+            nodes[element[1], 1],  # Closing the triangle
+        ]
+        y = [
+            nodes[element[1], 2],
+            nodes[element[2], 2],
+            nodes[element[3], 2],
+            nodes[element[1], 2],
+        ]
+        plot!(plt, x, y, lw = 1, linecolor = :black)
+    end
+
+    # Plot nodes
+    scatter!(plt, nodes[:, 1], nodes[:, 2], markersize = 4, color = :red)
+
+    # Annotate node indices with an offset for readability
+    dx, dy = 0.02, 0.02  # Adjust the offsets based on your mesh scale
+    for (i, (x, y)) in enumerate(eachrow(nodes))
+        annotate!(plt, x + dx, y + dy, text(string(i), 8, :blue))
+    end
+
+    display(plt)
+end

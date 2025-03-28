@@ -16,7 +16,7 @@ struct MeshData
 end
 
 function rectangle_domain(
-    domain,
+    domain;
     mesh_size::Real = 0.5,
     filename::String = "./mesh/rectangle_mesh.msh",
 )

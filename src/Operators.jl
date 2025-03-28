@@ -195,11 +195,11 @@ function load_term( upper_bounds::Vector{Float64},
 
         return triangle_area * 1 / 4 *
                (1 - x) *
-               (load_term .* hat_test) *
+               (load_term * hat_test') *
                space_enrichment *
                time_enrichment
     end
-    integral_result, abs_error = hcubature(integrand, lower_bounds, upper_bounds) # Use integrand
+    integral_result, abs_error = hcubature(integrand, lower_bounds, upper_bounds, rtol = 1e-10) # Use integrand
     return integral_result, abs_error
 end
 

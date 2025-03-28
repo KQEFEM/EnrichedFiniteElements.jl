@@ -12,28 +12,28 @@ const transformations = TransformationFunctions
 
 function exact_pressure_0_velocity(kx::Real, ky::Real,  w::Real)
 """
-This is based on the exact solution P29 in "Space-Time Enriched Finite Elements For
+This is based on the exact solution P49 in "Space-Time Enriched Finite Elements For
  Acoustic and Elastodynamic Problems"
 
- p = t^2 * sin(kx * x + ky * y + w * t), v - [0 0]
+ p = sin(k * xx - w*t), v=   k' / w * [sin(k * xx - w*t), -cos(k*x - w*t)]
 
  with RHS 
 
- f1 = ∂ₜp = 2*t * sin(kx * x + ky * y + w * t) + w * t^2 * cos(kx * x + ky * y + w * t)
- f_2 = ∇p = t^2 * cos(kx * x + ky * y + w * t) * [kx, ky]
+ f1 = ∂ₜp+∇v = (ky^2*cos(kx*x + ky*y - t*w))/w - w*cos(kx*x + ky*y - t*w) - (kx^2*sin(kx*x + ky*y - t*w))/w
+ f_2 = ∂ₜv+∇p = [kx*cos(kx*x + ky*y - t*w) + kx*sin(kx*x + ky*y - t*w),0]
 
  returns: Functions of the above 
 
  Note: There are no transformations here 
 """
 
-
-∂ₜp(x::Real, y::Real, t::Real) = 2 * t * sin(kx * x + ky * y + w * t) + w * t^2 * cos(kx * x + ky * y + w * t)
-∇ₓp(x::Real, y::Real, t::Real) = t^2 * cos(kx * x + ky * y + w * t) * ky
-∇ᵥp(x::Real, y::Real, t::Real) = t^2 * cos(kx * x + ky * y + w * t) * ky
+                                   
+∂ₜp∇v(x::Real, y::Real, t::Real) = (ky^2*cos(kx*x + ky*y - t*w))/w - w*cos(kx*x + ky*y - t*w) - (kx^2*sin(kx*x + ky*y - t*w))/w
+∂ₜv∇ₓp(x::Real, y::Real, t::Real) = kx*cos(kx*x + ky*y - t*w) + kx*sin(kx*x + ky*y - t*w)
+∂ₜv∇ᵥp(x::Real, y::Real, t::Real) = 0.0
 
     # Return them as a tuple of functions
-    return ∂ₜp, ∇ₓp, ∇ᵥp
+    return ∂ₜp∇v, ∂ₜv∇ₓp, ∂ₜv∇ᵥp
 end
 
 function load_term_integration( all_pairs,
@@ -72,7 +72,7 @@ function load_term_integration( all_pairs,
 
         cell_idx = LinearIndices(indexing_array)[ii[1][1][1], ii[1][1][2]] # this grabs the tuple ( - , - )
         upper_bounds = [1.0, 1.0, dt]
-        lower_bounds = [-1.0, -1.0, 0.0]
+        lower_bounds = [-1.0, -1.0, 0.0] #! this is wrong as it should be t_0,t_1
  # Integrating ∂ₜp
  f1_term, f2x_term, f2y_term = rhs_function
 #  print(f1_term)
@@ -87,11 +87,14 @@ function load_term_integration( all_pairs,
  # Integrating ∇ᵥp
  f2y_integral , _= integrator.load_term(upper_bounds, lower_bounds, A, B, C, omega, t0, tri_area,triangle_nodes, f2y_term)
 
- println(f1_integral)
- println(f1)
- f1[cell_idx][triangle_connectivity] .+= f1_integral
- f2x[cell_idx][triangle_connectivity] .+= f2x_integral
- f2y[cell_idx][triangle_connectivity] .+= f2y_integral
+#  println(f1_in print(dhsdjah)
+# tegral)
+#  println(f1)
+#  println(size(f1_integral))
+#  println(size(f1[cell_idx][triangle_connectivity]))
+ f1[cell_idx][triangle_connectivity,1] .+= f1_integral
+ f2x[cell_idx][triangle_connectivity,1] .+= f2x_integral
+ f2y[cell_idx][triangle_connectivity,1] .+= f2y_integral
 
  
     end 
