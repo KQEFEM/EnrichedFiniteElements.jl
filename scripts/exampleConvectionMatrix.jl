@@ -47,7 +47,7 @@ wave_node_pairs = result
 dt = 0.1
 
 using Revise
- _, pDtq_cell, vDxeta_cell = matrix_comp.compute_sparse_matrix(
+ _, convection_cell = matrix_comp.compute_sparse_matrix(
     all_pairs,
     nodes,
     wave_node_pairs,
@@ -57,6 +57,8 @@ using Revise
     dt,
     convection_bool = true,
 )
+vDxeta_cell = convection_cell[2]
+pDtq_cell = convection_cell[1]
 vDxeta_cell = permutedims(vDxeta_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
 pDtq_cell = permutedims(pDtq_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
 
@@ -68,7 +70,7 @@ using DelimitedFiles
 using SparseArrays
 
 # Load the data from the text file
-data = readdlm("test/testdata/ConvectionDt_time.txt")
+data = readdlm("test/testdata/ConvectionDt_space_time.txt")
 
 # Extract row indices, column indices, and values
 rows = Int.(data[:, 1])

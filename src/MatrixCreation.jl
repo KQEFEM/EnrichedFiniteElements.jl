@@ -92,24 +92,36 @@ function compute_sparse_matrix(
     test_bool: will create the mass matrix 
     connectivity_matrix: joint connectivity with wavenumbers and nodes
 
+    returns:
+    mass_cell: tuple containing the following
+        mass_cell_t1: this is the upper time jump (t_1-t_0)
+        mass_cell_t0: this is the lower time jump (t_0-t_0)
+    
+    convection_cell: tuple containing the following
+        (pDtq_cell, vDxeta_cell,vDyeta_cell)
+
     """
     indexing_array = Array{SparseMatrixCSC{ComplexF64,Int64}}(
         undef,
         all_pairs[end][1],
         all_pairs[end][2],
     ) #! This is simply for the for loop
-    mass_sparse_array = nothing # Initialize outside the if block
-    pDtq_array = nothing      # Initialize outside the if block
-    vDxeta_array = nothing
-    vDyeta_array = nothing
+    mass_cell_t1 = nothing # Initialize outside the if block
+    mass_cell_t0 = nothing
+    pDtq_cell = nothing      # Initialize outside the if block
+    vDxeta_cell = nothing
+    vDyeta_cell = nothing
     if mass_bool == true
-        mass_sparse_array = sparse_matrix_creation(all_pairs, nodes)
+        mass_cell_t1 = sparse_matrix_creation(all_pairs, nodes)
+        mass_cell_t0 = sparse_matrix_creation(all_pairs, nodes)
+        mass_cell = nothing
     end
     if convection_bool == true
-        pDtq_array = sparse_matrix_creation(all_pairs, nodes)
+        pDtq_cell = sparse_matrix_creation(all_pairs, nodes)
         #! There will be tohers to add also
-        vDxeta_array = sparse_matrix_creation(all_pairs, nodes)
-        vDyeta_array = sparse_matrix_creation(all_pairs, nodes)
+        vDxeta_cell = sparse_matrix_creation(all_pairs, nodes)
+        vDyeta_cell = sparse_matrix_creation(all_pairs, nodes)
+        convection_cell = nothing
 
     end
 
@@ -129,7 +141,6 @@ function compute_sparse_matrix(
             transformations.Gradients_Larson(triangle_nodes[:, 1], triangle_nodes[:, 2])
         
 
-
         cell_idx = LinearIndices(indexing_array)[ii[1][1][1], ii[1][1][2]] # this grabs the tuple ( - , - )
 
         if mass_bool == true
@@ -137,8 +148,8 @@ function compute_sparse_matrix(
             lower_bounds = [-1.0, -1.0, 0.0] # time integral is a dummy variable here
 
 
-            mass_sparse_array = create_components_mass_matrix(
-                mass_sparse_array,
+            mass_cell_t1 = create_components_mass_matrix(
+                mass_cell_t1,
                 cell_idx,
                 triangle_connectivity,
                 upper_bounds,
@@ -152,13 +163,29 @@ function compute_sparse_matrix(
                 t0,
                 tri_area,
             )
+            mass_cell_t0 = create_components_mass_matrix(
+                mass_cell_t0,
+                cell_idx,
+                triangle_connectivity,
+                upper_bounds,
+                lower_bounds,
+                A,
+                B,
+                C,
+                omega,
+                t0,
+                dt,
+                t0,
+                tri_area,
+            )
         end
         if convection_bool == true
             # println(size(ddx))
             # println(ddx)
-            pDtq_array, vDxeta_array =  create_components_convection_matrix(
-            pDtq_array,
-            vDxeta_array,
+            pDtq_cell, vDxeta_cell,vDyeta_cell =  create_components_convection_matrix(
+            pDtq_cell,
+            vDxeta_cell,
+            vDyeta_cell,
             cell_idx,
             triangle_connectivity,
             A,
@@ -173,8 +200,11 @@ function compute_sparse_matrix(
         )
         end
     end
-    # mass_sparse_array = reshape(mass_sparse_array,sqrt(idx),:)
-    return mass_sparse_array, pDtq_array, vDxeta_array
+    mass_cell = (mass_cell_t1, mass_cell_t0)
+    convection_cell = (pDtq_cell, vDxeta_cell,vDyeta_cell)
+
+    # mass_cell_t1 = reshape(mass_cell_t1,sqrt(idx),:)
+    return mass_cell, convection_cell
 end
 
 function convert_sparse_cell_to_array(
@@ -191,7 +221,7 @@ function convert_sparse_cell_to_array(
 end
 
 function create_components_mass_matrix(
-    mass_sparse_array::Array{SparseMatrixCSC{ComplexF64,Int64}},
+    mass_cell::Array{SparseMatrixCSC{ComplexF64,Int64}},
     cell_idx::Int,
     triangle_connectivity::SubArray{
         Int64,
@@ -226,13 +256,14 @@ function create_components_mass_matrix(
         t0,
         tri_area,
     )
-    mass_sparse_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= mass_loc
-    return mass_sparse_array
+    mass_cell[cell_idx][triangle_connectivity, triangle_connectivity] .+= mass_loc
+    return mass_cell
 end
 
 function create_components_convection_matrix(
-    pDtq_array::Array{SparseMatrixCSC{ComplexF64,Int64}},
-    vDxeta_array::Array{SparseMatrixCSC{ComplexF64,Int64}},
+    pDtq_cell::Array{SparseMatrixCSC{ComplexF64,Int64}},
+    vDxeta_cell::Array{SparseMatrixCSC{ComplexF64,Int64}},
+    vDyeta_cell::Array{SparseMatrixCSC{ComplexF64,Int64}},
     cell_idx::Int,
     triangle_connectivity::SubArray{
         Int64,
@@ -248,7 +279,7 @@ function create_components_convection_matrix(
     dt::Float64,
     t0::Float64,
     
-    gradients::Tuple{Matrix{Int64}, Matrix{Int64}},
+    gradients::Tuple{Matrix{Float64}, Matrix{Float64}},
 
     test_wavenumber::Vector{Float64},
     tri_area::Float64,
@@ -264,11 +295,13 @@ test_wavenumber
             pdtq_loc, _ =
                 integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega, t0, tri_area)
 
-            pDtq_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= pdtq_loc
+            pDtq_cell[cell_idx][triangle_connectivity, triangle_connectivity] .+= pdtq_loc
             vDxeta_loc, _ = integrator.v_nabla_q(upper_bounds, lower_bounds, A, B, C, omega, ddx, test_wavenumber[1], t0, tri_area)
-            vDxeta_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= vDxeta_loc
+            vDxeta_cell[cell_idx][triangle_connectivity, triangle_connectivity] .+= vDxeta_loc
+            vDyeta_loc, _ = integrator.v_nabla_q(upper_bounds, lower_bounds, A, B, C, omega, ddy, test_wavenumber[1], t0, tri_area)
+            vDyeta_cell[cell_idx][triangle_connectivity, triangle_connectivity] .+= vDyeta_loc
 
-            return pDtq_array, vDxeta_array
+            return pDtq_cell, vDxeta_cell, vDyeta_cell
 end
 end
 

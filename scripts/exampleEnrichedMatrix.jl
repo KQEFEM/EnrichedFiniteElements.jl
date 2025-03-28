@@ -23,8 +23,8 @@ connectivity = mesh.connectivity
 boundary_index = mesh.boundary_idx
 boundary_edges = mesh.boundary_edges
 
-wave_x = 0
-wave_y = 0
+wave_x = 1
+wave_y = 1
 ansatz_wave = wave_func.create_wavenumbers(wave_x, wave_y)
 test_ansatz = wave_func.create_wavenumbers(wave_x, wave_y)
 wavenumbers_ansatz, wavenumbers_test =
@@ -41,7 +41,7 @@ result = wave_func.combine_wavenumber_with_all_nodes(all_pairs, connectivity)
 wave_node_pairs = result
 dt = 0.1
 using Revise
-cell_sparse_zero_array_2,_,_ = matrix_comp.compute_sparse_matrix(
+mass_cell,_ = matrix_comp.compute_sparse_matrix(
     all_pairs,
     nodes,
     wave_node_pairs,
@@ -53,6 +53,7 @@ cell_sparse_zero_array_2,_,_ = matrix_comp.compute_sparse_matrix(
     t0 = 0.0,
     mass_bool = true,
 )
+mass_cell
 
 # Assemble the final large matrix without loops
 num_rows = size(cell_sparse_zero_array_2, 1)

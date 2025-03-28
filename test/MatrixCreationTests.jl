@@ -14,7 +14,11 @@ const integrator = EnrichedFiniteElements.Operators
 const mesh_create = EnrichedFiniteElements.MeshCreation
 const wave_func = EnrichedFiniteElements.EnrichmentCreator
 const matrix_comp = EnrichedFiniteElements.MatrixCreation
+#! Set up for the matrix creation
+const domain = ((0, 1), (0, 1))
 
+# Create the mesh
+const mesh = mesh_create.rectangle_domain(domain)
 
 function load_matlab_matrix(filename)
     # Load the data from the text file
@@ -39,11 +43,7 @@ function setup_test_environment(;
     """
     zero_frequencies : bool: sets the frequencies to be 0
     """
-    #! Set up for the matrix creation
-    domain = ((0, 1), (0, 1))
-
-    # Create the mesh
-    mesh = mesh_create.rectangle_domain(domain)
+    
 
     nodes = mesh.nodes
     connectivity = mesh.connectivity
@@ -107,7 +107,7 @@ end
             idx_connectivity,
             wave_node_pairs = setup_test_environment(wave_x = 0, wave_y = 0)
 
-            array, _ = matrix_comp.compute_sparse_matrix(
+            cell, _ = matrix_comp.compute_sparse_matrix(
                 all_pairs,
                 nodes,
                 wave_node_pairs,
@@ -136,8 +136,10 @@ end
                 0 0.0117 0 0 0.0107 0.0108 0 0 0 0.0098 0.0098 0.0528
             ]
 
+            array = matrix_comp.convert_sparse_cell_to_array(cell[1])
+
             @test isapprox(
-                norm(real(array[1] - matrix)),
+                norm(real(array - matrix)),
                 0.00022378579972373314,
                 atol = 1e-3,
             ) # This is with the spatial step, dx
@@ -161,7 +163,7 @@ end
             wave_node_pairs =
                 setup_test_environment(wave_x = 1, wave_y = 1, zero_frequencies = true)
 
-            array, _ = matrix_comp.compute_sparse_matrix(
+            cell, _ = matrix_comp.compute_sparse_matrix(
                 all_pairs,
                 nodes,
                 wave_node_pairs,
@@ -174,14 +176,13 @@ end
                 mass_bool = true,
                 convection_bool = false,
             )
-
-            array = matrix_comp.convert_sparse_cell_to_array(array)
-
+       
+            
+            array = matrix_comp.convert_sparse_cell_to_array(cell[1])
             exact_matrix = 
                 conj(load_matlab_matrix("test/testdata/MassMatrixEnriched_noFrequencies.txt"))
              #! This conjudate is simply as the matlab code orders in a differnet way
-            # println(norm(array - exact_matrix))
-            # println(norm(imag(final_matrix - exact_matrix)))
+
             @test isapprox(norm(array - exact_matrix), 3.984715840345388e-7) # This is with the spatial step, dx
             @test isapprox(norm(real(array - exact_matrix)), 2.92067550635342e-7)
             @test isapprox(norm(imag(array - exact_matrix)), 2.7106484307055905e-7)
@@ -206,7 +207,7 @@ end
             wave_node_pairs =
                 setup_test_environment(wave_x = 1, wave_y = 1, zero_frequencies = false)
 
-            array, _ = matrix_comp.compute_sparse_matrix(
+            cell, _ = matrix_comp.compute_sparse_matrix(
                 all_pairs,
                 nodes,
                 wave_node_pairs,
@@ -220,7 +221,7 @@ end
                 convection_bool = false,
             )
 
-            array = matrix_comp.convert_sparse_cell_to_array(array)
+            array = matrix_comp.convert_sparse_cell_to_array(cell[1])
 
             exact_matrix =
                 conj(load_matlab_matrix("test/testdata/MassMatrixEnriched_enriched.txt")) #! This conjudate is simply as the matlab code orders in a differnet way
@@ -247,7 +248,7 @@ end
             all_pairs,
             idx_connectivity,
             wave_node_pairs = setup_test_environment(wave_x = 0, wave_y = 0)
-            _, pDtq_cell,_ = matrix_comp.compute_sparse_matrix(
+            _, convection_cell = matrix_comp.compute_sparse_matrix(
                 all_pairs,
                 nodes,
                 wave_node_pairs,
@@ -257,7 +258,7 @@ end
                 dt,
                 convection_bool = true,
             )
-            
+  pDtq_cell = convection_cell[1]
 pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enrichments for julia to match MATLAB
 
             array = matrix_comp.convert_sparse_cell_to_array(pDtq_cell)
@@ -281,7 +282,7 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
             wave_node_pairs =
                 setup_test_environment(wave_x = 1, wave_y = 1, time_enrichment_only = true)
 
-            _, pDtq_cell,_ = matrix_comp.compute_sparse_matrix(
+            _, convection_cell = matrix_comp.compute_sparse_matrix(
                 all_pairs,
                 nodes,
                 wave_node_pairs,
@@ -291,6 +292,7 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
                 dt,
                 convection_bool = true,
             )
+  pDtq_cell = convection_cell[1]
 pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enrichments for julia to match MATLAB
 
             array = matrix_comp.convert_sparse_cell_to_array(pDtq_cell)
@@ -320,7 +322,7 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
             wave_node_pairs =
                 setup_test_environment(wave_x = 1, wave_y = 1, time_enrichment_only = false)
 
-            _, pDtq_cell,_ = matrix_comp.compute_sparse_matrix(
+            _, convection_cell = matrix_comp.compute_sparse_matrix(
                 all_pairs,
                 nodes,
                 wave_node_pairs,
@@ -331,6 +333,7 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
                 convection_bool = true,
             )
             
+  pDtq_cell = convection_cell[1]
 pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enrichments for julia to match MATLAB
 
             array = matrix_comp.convert_sparse_cell_to_array(pDtq_cell)
@@ -360,7 +363,7 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
             wave_node_pairs =
                 setup_test_environment(wave_x = 0, wave_y = 0, time_enrichment_only = false)
 
-                _, _,vDxeta_cell = matrix_comp.compute_sparse_matrix(
+                _, convection_cell = matrix_comp.compute_sparse_matrix(
                     all_pairs,
                     nodes,
                     wave_node_pairs,
@@ -370,6 +373,8 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
                     dt,
                     convection_bool = true,
                 )
+
+              vDxeta_cell = convection_cell[2]
 
                 vDxeta_cell = permutedims(vDxeta_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
                 array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell)
@@ -400,7 +405,7 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
             wave_node_pairs =
                 setup_test_environment(wave_x = 1, wave_y = 1, time_enrichment_only = true)
 
-                _, _,vDxeta_cell = matrix_comp.compute_sparse_matrix(
+                _, convection_cell = matrix_comp.compute_sparse_matrix(
                     all_pairs,
                     nodes,
                     wave_node_pairs,
@@ -410,6 +415,8 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
                     dt,
                     convection_bool = true,
                 )
+
+              vDxeta_cell = convection_cell[2]
 
                 vDxeta_cell = permutedims(vDxeta_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
                 array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell)
@@ -444,7 +451,7 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
             wave_node_pairs =
                 setup_test_environment(wave_x = 1, wave_y = 1, time_enrichment_only = false)
 
-                _, _,vDxeta_cell = matrix_comp.compute_sparse_matrix(
+                _, convection_cell = matrix_comp.compute_sparse_matrix(
                     all_pairs,
                     nodes,
                     wave_node_pairs,
@@ -454,6 +461,8 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
                     dt,
                     convection_bool = true,
                 )
+
+              vDxeta_cell = convection_cell[2]
 
                 vDxeta_cell = permutedims(vDxeta_cell, (2,1)) #!There is a missing transpose somewhere in the basis operations
                 array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell)
