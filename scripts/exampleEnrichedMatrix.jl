@@ -23,8 +23,8 @@ connectivity = mesh.connectivity
 boundary_index = mesh.boundary_idx
 boundary_edges = mesh.boundary_edges
 
-wave_x = 1
-wave_y = 1
+wave_x = 0
+wave_y = 0
 ansatz_wave = wave_func.create_wavenumbers(wave_x, wave_y)
 test_ansatz = wave_func.create_wavenumbers(wave_x, wave_y)
 wavenumbers_ansatz, wavenumbers_test =

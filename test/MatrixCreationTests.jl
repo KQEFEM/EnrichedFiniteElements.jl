@@ -442,7 +442,7 @@ pDtq_cell = permutedims(pDtq_cell, (2,1)) #!This fixes the ordering of the enric
             all_pairs,
             idx_connectivity,
             wave_node_pairs =
-                setup_test_environment(wave_x = 1, wave_y = 1, time_enrichment_only = true)
+                setup_test_environment(wave_x = 1, wave_y = 1, time_enrichment_only = false)
 
                 _, _,vDxeta_cell = matrix_comp.compute_sparse_matrix(
                     all_pairs,

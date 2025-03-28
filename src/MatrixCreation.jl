@@ -246,7 +246,9 @@ function create_components_convection_matrix(
     omega::Vector{Float64},
     dt::Float64,
     t0::Float64,
-    ddx::Matrix{Float64},
+    
+    gradients::Matrix{Float64},
+
     test_wavenumber::Vector{Float64},
     tri_area::Float64,
 )#::(Array{SparseMatrixCSC{ComplexF64,Int64}},Array{SparseMatrixCSC{ComplexF64,Int64}})
@@ -255,7 +257,8 @@ test_wavenumber
 """
             upper_bounds = [1.0, 1.0, dt]
             lower_bounds = [-1.0, -1.0, 0.0]
-
+            ddx = gradients[1]
+            ddy = gradients[2]
 
             pdtq_loc, _ =
                 integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega, t0, tri_area)

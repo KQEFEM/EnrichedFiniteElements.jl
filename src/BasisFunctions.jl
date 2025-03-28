@@ -29,7 +29,7 @@ function p_matrix(x::Real, y::Real, z::Real = 0)
     """
     phi_val = phi(x, y)
     # println(phi_val)
-    return phi_val * phi_val'  # Use * for matrix multiplication
+    return phi_val .* phi_val'  # Use * for matrix multiplication
 end
 
 function grads_matrix(
