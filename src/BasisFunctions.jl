@@ -13,7 +13,7 @@ function phi(x::Real, y::Real, z::Real = 0.0)
     Returns:
         A 3x1 matrix (column vector) of the basis function values.
     """
-    return [1 - x - y; x; y]
+    return transpose([1 - x - y; x; y]) #! This is where the missing transpose is - we shall see if this effects the main computation 
 end
 
 function p_matrix(x::Real, y::Real, z::Real = 0)
@@ -47,9 +47,12 @@ function grads_matrix(
     Returns:
         A 3x3 matrix.
     """
-    rows, cols = size(grad_matrix)
-    if rows != 3 || cols != 3
-        error("Input matrix must be 3x3.")
+  
+
+    grad_matrix = transpose(grad_matrix)
+    rows,cols = size(grad_matrix)
+    if cols != 3 || rows != 1
+        error("Input matrix must be 3x1.")
     end
     return grad_matrix
 end

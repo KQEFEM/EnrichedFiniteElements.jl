@@ -149,7 +149,7 @@ function mass_jump(
 
         return triangle_area * 1 / 4 *
                (1 - x) *
-               (hat_ansatz * hat_test') *
+               (hat_ansatz .* hat_test') *
                space_enrichment *
                time_enrichment
     end

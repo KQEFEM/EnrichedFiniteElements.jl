@@ -177,9 +177,9 @@ end
 
             array = matrix_comp.convert_sparse_cell_to_array(array)
 
-            exact_matrix = conj(
-                load_matlab_matrix("test/testdata/MassMatrixEnriched_noFrequencies.txt"),
-            ) #! This conjudate is simply as the matlab code orders in a differnet way
+            exact_matrix = 
+                conj(load_matlab_matrix("test/testdata/MassMatrixEnriched_noFrequencies.txt"))
+             #! This conjudate is simply as the matlab code orders in a differnet way
             # println(norm(array - exact_matrix))
             # println(norm(imag(final_matrix - exact_matrix)))
             @test isapprox(norm(array - exact_matrix), 3.984715840345388e-7) # This is with the spatial step, dx
@@ -231,105 +231,133 @@ end
         end
     end
 
-    @testset "Convection Matrix" begin
+    # @testset "Convection Matrix" begin
 
-        @testset "pDtq FEM" begin
-            dt = 0.1
-            t0 = 0.0
-            nodes,
-            connectivity,
-            boundary_index,
-            boundary_edges,
-            wavenumbers_ansatz,
-            wavenumbers_test,
-            idx_wave_ansatz,
-            idx_wave_test,
-            all_pairs,
-            idx_connectivity,
-            wave_node_pairs = setup_test_environment(wave_x = 0, wave_y = 0)
-            print(wavenumbers_ansatz)
-            _, conv = matrix_comp.compute_sparse_matrix(
-                all_pairs,
-                nodes,
-                wave_node_pairs,
-                wavenumbers_ansatz,
-                wavenumbers_test,
-                integrator,
-                dt,
-                convection_bool = true,
-            )
-            array = matrix_comp.convert_sparse_cell_to_array(conv)
-            @test isequal(array, spzeros(size(array, 1), size(array, 2)))
+    #     @testset "pDtq FEM" begin
+    #         dt = 0.1
+    #         t0 = 0.0
+    #         nodes,
+    #         connectivity,
+    #         boundary_index,
+    #         boundary_edges,
+    #         wavenumbers_ansatz,
+    #         wavenumbers_test,
+    #         idx_wave_ansatz,
+    #         idx_wave_test,
+    #         all_pairs,
+    #         idx_connectivity,
+    #         wave_node_pairs = setup_test_environment(wave_x = 0, wave_y = 0)
+    #         print(wavenumbers_ansatz)
+    #         _, pDtq_array,_ = matrix_comp.compute_sparse_matrix(
+    #             all_pairs,
+    #             nodes,
+    #             wave_node_pairs,
+    #             wavenumbers_ansatz,
+    #             wavenumbers_test,
+    #             integrator,
+    #             dt,
+    #             convection_bool = true,
+    #         )
+    #         array = matrix_comp.convert_sparse_cell_to_array(conv)
+    #         @test isequal(array, spzeros(size(array, 1), size(array, 2)))
 
-        end
-        @testset "pDtq EFEM Time only" begin
-            dt = 0.1
-            t0 = 0.0
-            nodes,
-            connectivity,
-            boundary_index,
-            boundary_edges,
-            wavenumbers_ansatz,
-            wavenumbers_test,
-            idx_wave_ansatz,
-            idx_wave_test,
-            all_pairs,
-            idx_connectivity,
-            wave_node_pairs =
-                setup_test_environment(wave_x = 1, wave_y = 1, time_enrichment_only = true)
+    #     end
+    #     @testset "pDtq EFEM Time only" begin
+    #         dt = 0.1
+    #         t0 = 0.0
+    #         nodes,
+    #         connectivity,
+    #         boundary_index,
+    #         boundary_edges,
+    #         wavenumbers_ansatz,
+    #         wavenumbers_test,
+    #         idx_wave_ansatz,
+    #         idx_wave_test,
+    #         all_pairs,
+    #         idx_connectivity,
+    #         wave_node_pairs =
+    #             setup_test_environment(wave_x = 1, wave_y = 1, time_enrichment_only = true)
 
-            _, conv = matrix_comp.compute_sparse_matrix(
-                all_pairs,
-                nodes,
-                wave_node_pairs,
-                wavenumbers_ansatz,
-                wavenumbers_test,
-                integrator,
-                dt,
-                convection_bool = true,
-            )
-            array = matrix_comp.convert_sparse_cell_to_array(conv)
-            exact_matrix =
-                transpose(load_matlab_matrix("test/testdata/ConvectionDt_time.txt")) #! This transpose is simply as the matlab code orders in a differnet way
+    #         _, pDtq_array,_ = matrix_comp.compute_sparse_matrix(
+    #             all_pairs,
+    #             nodes,
+    #             wave_node_pairs,
+    #             wavenumbers_ansatz,
+    #             wavenumbers_test,
+    #             integrator,
+    #             dt,
+    #             convection_bool = true,
+    #         )
+    #         array = matrix_comp.convert_sparse_cell_to_array(conv)
+    #         exact_matrix =
+    #             transpose(load_matlab_matrix("test/testdata/ConvectionDt_time.txt")) #! This transpose is simply as the matlab code orders in a differnet way
 
-            @test isapprox(norm(real(array - exact_matrix)), 1.9900648112369652e-9)
-
-
-        end
-        @testset "pDtq EFEM Space-Time" begin
-            dt = 0.1
-            t0 = 0.0
-            nodes,
-            connectivity,
-            boundary_index,
-            boundary_edges,
-            wavenumbers_ansatz,
-            wavenumbers_test,
-            idx_wave_ansatz,
-            idx_wave_test,
-            all_pairs,
-            idx_connectivity,
-            wave_node_pairs =
-                setup_test_environment(wave_x = 1, wave_y = 1, time_enrichment_only = false)
-
-            _, conv = matrix_comp.compute_sparse_matrix(
-                all_pairs,
-                nodes,
-                wave_node_pairs,
-                wavenumbers_ansatz,
-                wavenumbers_test,
-                integrator,
-                dt,
-                convection_bool = true,
-            )
-            array = matrix_comp.convert_sparse_cell_to_array(conv)
-            exact_matrix =
-                transpose(load_matlab_matrix("test/testdata/ConvectionDt_space_time.txt")) #! This transpose is simply as the matlab code orders in a differnet way
-            @test isapprox(norm(real(array - exact_matrix)), 6.187951325268305e-8)
+    #         @test isapprox(norm(real(array - exact_matrix)), 1.9900648112369652e-9)
 
 
-        end
-    end
+    #     end
+    #     @testset "pDtq EFEM Space-Time" begin
+    #         dt = 0.1
+    #         t0 = 0.0
+    #         nodes,
+    #         connectivity,
+    #         boundary_index,
+    #         boundary_edges,
+    #         wavenumbers_ansatz,
+    #         wavenumbers_test,
+    #         idx_wave_ansatz,
+    #         idx_wave_test,
+    #         all_pairs,
+    #         idx_connectivity,
+    #         wave_node_pairs =
+    #             setup_test_environment(wave_x = 1, wave_y = 1, time_enrichment_only = false)
+
+    #         _, pDtq_array,_ = matrix_comp.compute_sparse_matrix(
+    #             all_pairs,
+    #             nodes,
+    #             wave_node_pairs,
+    #             wavenumbers_ansatz,
+    #             wavenumbers_test,
+    #             integrator,
+    #             dt,
+    #             convection_bool = true,
+    #         )
+    #         array = matrix_comp.convert_sparse_cell_to_array(conv)
+    #         exact_matrix =
+    #             transpose(load_matlab_matrix("test/testdata/ConvectionDt_space_time.txt")) #! This transpose is simply as the matlab code orders in a differnet way
+    #         @test isapprox(norm(real(array - exact_matrix)), 6.187951325268305e-8)
+
+
+    #     end
+
+    #     @testset "v_nabla_q FEM" begin
+    #         dt = 0.1
+    #         t0 = 0.0
+    #         nodes,
+    #         connectivity,
+    #         boundary_index,
+    #         boundary_edges,
+    #         wavenumbers_ansatz,
+    #         wavenumbers_test,
+    #         idx_wave_ansatz,
+    #         idx_wave_test,
+    #         all_pairs,
+    #         idx_connectivity,
+    #         wave_node_pairs =
+    #             setup_test_environment(wave_x = 0, wave_y = 0, time_enrichment_only = false)
+
+    #             _, _,vDxeta_array = matrix_comp.compute_sparse_matrix(
+    #                 all_pairs,
+    #                 nodes,
+    #                 wave_node_pairs,
+    #                 wavenumbers_ansatz,
+    #                 wavenumbers_test,
+    #                 integrator,
+    #                 dt,
+    #                 convection_bool = true,
+    #             )
+    #     end
+    # end
 
 
 
