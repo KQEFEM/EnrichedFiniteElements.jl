@@ -68,7 +68,7 @@ function enrichment_transformations(
         kx_kkx * (triangle_nodes[3, 1] - triangle_nodes[1, 1]) +
         ky_kky * (triangle_nodes[3, 2] - triangle_nodes[1, 2])
     C = kx_kkx * triangle_nodes[1, 1] + ky_kky * triangle_nodes[1, 2]
-    return kx_kkx, ky_kky, omega, A, B, C
+    return wave_ansatz_loc, wave_test_loc, kx_kkx, ky_kky, omega, A, B, C
 end
 
 function compute_sparse_matrix(
@@ -100,13 +100,14 @@ function compute_sparse_matrix(
     ) #! This is simply for the for loop
     mass_sparse_array = nothing # Initialize outside the if block
     pDtq_array = nothing      # Initialize outside the if block
-
+    vDxeta_array = nothing
     if mass_bool == true
         mass_sparse_array = sparse_matrix_creation(all_pairs, nodes)
     end
     if convection_bool == true
         pDtq_array = sparse_matrix_creation(all_pairs, nodes)
         #! There will be tohers to add also
+        vDxeta_array = sparse_matrix_creation(all_pairs, nodes)
 
     end
 
@@ -115,7 +116,7 @@ function compute_sparse_matrix(
         #! This can be parallelised but it needs splitting into unique columns wrt to wave-pair 
 
         triangle_nodes, triangle_connectivity = nodal_transformations(ii, nodes)
-        kx_kkx, ky_kky, omega, A, B, C = enrichment_transformations(
+        _, wave_test_loc , _, _, omega, A, B, C = enrichment_transformations(
             ii,
             wavenumbers_ansatz,
             wavenumbers_test,
@@ -152,18 +153,29 @@ function compute_sparse_matrix(
             )
         end
         if convection_bool == true
-            upper_bounds = [1.0, 1.0, dt]
-            lower_bounds = [-1.0, -1.0, 0.0]
-
-
-            pdtq_loc, _ =
-                integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega, t0, tri_area)
-
-            pDtq_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= pdtq_loc
+            # println(size(ddx))
+            # println(ddx)
+            pDtq_array, vDxeta_array =  create_components_convection_matrix(
+            pDtq_array,
+            vDxeta_array,
+            cell_idx,
+            triangle_connectivity,
+            A,
+            B,
+            C,
+            omega,
+            dt,
+            t0,
+            ddx,
+            wave_test_loc,
+            tri_area,
+        )
+        pDtq_array = permutedims(pDtq_array, (2,1))
+        vDxeta_array = permutedims(vDxeta_array, (2,1)) #!There is a missing transpose somewhere in the basis operations
         end
     end
     # mass_sparse_array = reshape(mass_sparse_array,sqrt(idx),:)
-    return mass_sparse_array, pDtq_array
+    return mass_sparse_array, pDtq_array, vDxeta_array
 end
 
 function convert_sparse_cell_to_array(
@@ -217,6 +229,44 @@ function create_components_mass_matrix(
     )
     mass_sparse_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= mass_loc
     return mass_sparse_array
+end
+
+function create_components_convection_matrix(
+    pDtq_array::Array{SparseMatrixCSC{ComplexF64,Int64}},
+    vDxeta_array::Array{SparseMatrixCSC{ComplexF64,Int64}},
+    cell_idx::Int,
+    triangle_connectivity::SubArray{
+        Int64,
+        1,
+        Matrix{Int64},
+        Tuple{Int64,Base.Slice{Base.OneTo{Int64}}},
+        true,
+    },
+    A::Float64,
+    B::Float64,
+    C::Float64,
+    omega::Vector{Float64},
+    dt::Float64,
+    t0::Float64,
+    ddx::Matrix{Float64},
+    test_wavenumber::Vector{Float64},
+    tri_area::Float64,
+)#::(Array{SparseMatrixCSC{ComplexF64,Int64}},Array{SparseMatrixCSC{ComplexF64,Int64}})
+"""
+test_wavenumber
+"""
+            upper_bounds = [1.0, 1.0, dt]
+            lower_bounds = [-1.0, -1.0, 0.0]
+
+
+            pdtq_loc, _ =
+                integrator.pDtq(upper_bounds, lower_bounds, A, B, C, omega, t0, tri_area)
+
+            pDtq_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= pdtq_loc
+            vDxeta_loc, _ = integrator.v_nabla_q(upper_bounds, lower_bounds, A, B, C, omega, ddx, test_wavenumber[1], t0, tri_area)
+            vDxeta_array[cell_idx][triangle_connectivity, triangle_connectivity] .+= vDxeta_loc
+
+            return pDtq_array, vDxeta_array
 end
 end
 
