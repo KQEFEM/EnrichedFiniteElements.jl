@@ -8,4 +8,5 @@ using Test
     include("OperatorsTests.jl")      # Include the tests for Operatorsend
     include("MatrixCreationTests.jl")
     include("TransformationFunctionsTests.jl")
+    include("ForumlationTests.jl")
 end

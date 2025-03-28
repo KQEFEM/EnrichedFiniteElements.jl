@@ -56,7 +56,7 @@ using EnrichedFiniteElements
             t0,
             triangle_area,
         )
-        println(result2)
+        
         @test isapprox(real(result2), real(expected_result2), atol = 1e-6)
         @test isapprox(imag(result2), imag(expected_result2), atol = 1e-6)
 

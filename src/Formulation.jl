@@ -1,4 +1,4 @@
-module Formualtion
+module Formulation
 
 using SparseArrays
 
