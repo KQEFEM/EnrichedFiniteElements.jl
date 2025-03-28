@@ -118,7 +118,6 @@ function compute_sparse_matrix(
     end
     if convection_bool == true
         pDtq_cell = sparse_matrix_creation(all_pairs, nodes)
-        #! There will be tohers to add also
         vDxeta_cell = sparse_matrix_creation(all_pairs, nodes)
         vDyeta_cell = sparse_matrix_creation(all_pairs, nodes)
         convection_cell = nothing
@@ -206,18 +205,29 @@ function compute_sparse_matrix(
     # mass_cell_t1 = reshape(mass_cell_t1,sqrt(idx),:)
     return mass_cell, convection_cell
 end
-
 function convert_sparse_cell_to_array(
     sparse_cell_array::Matrix{SparseMatrixCSC{ComplexF64,Int64}},
 )
+    """
+    Converts a matrix of sparse matrices into a single dense matrix.
+    
+    This function takes a matrix where each entry is a sparse matrix and combines them
+    into a single large matrix by horizontally concatenating the elements in each row
+    and then vertically concatenating the resulting blocks.
+    
+    # Arguments
+    - `sparse_cell_array::Matrix{SparseMatrixCSC{ComplexF64,Int64}}`: A matrix where
+      each element is a sparse matrix.
+    
+    # Returns
+    - A single `SparseMatrixCSC{ComplexF64,Int64}` combining all elements of `sparse_cell_array`.
+    """
     num_rows = size(sparse_cell_array, 1)
     num_cols = size(sparse_cell_array, 2)
     return reduce(
         vcat,
         [reduce(hcat, [sparse_cell_array[i, j] for j = 1:num_cols]) for i = 1:num_rows],
     )
-
-
 end
 
 function create_components_mass_matrix(
@@ -242,7 +252,26 @@ function create_components_mass_matrix(
     tri_area::Float64,
 )::Array{SparseMatrixCSC{ComplexF64,Int64}}
     """ 
-    This creates the components for the mass matrix. It does not assemble mass matrix. 
+    Computes and updates the components of the mass matrix.
+    
+    This function does not assemble the full mass matrix but updates the mass matrix
+    components for a given cell index using integration over triangular elements.
+    
+    # Arguments
+    - `mass_cell::Array{SparseMatrixCSC{ComplexF64,Int64}}`: Array of sparse mass matrices.
+    - `cell_idx::Int`: Index of the current cell.
+    - `triangle_connectivity::SubArray{Int64,1,...}`: Connectivity information for triangles.
+    - `upper_bounds::Vector{Float64}`: Upper integration limits.
+    - `lower_bounds::Vector{Float64}`: Lower integration limits.
+    - `A::Float64, B::Float64, C::Float64`: Coefficients related to the mass matrix.
+    - `omega::Vector{Float64}`: Frequency-related parameters.
+    - `t_jump::Float64`: Jump discontinuity in time.
+    - `dt::Float64`: Time step size.
+    - `t0::Float64`: Initial time.
+    - `tri_area::Float64`: Area of the triangle element.
+    
+    # Returns
+    - `Array{SparseMatrixCSC{ComplexF64,Int64}}`: Updated mass matrix array.
     """
     mass_loc, _ = integrator.mass_jump(
         upper_bounds,
@@ -281,9 +310,30 @@ function create_components_convection_matrix(
     gradients::Tuple{Matrix{Float64},Matrix{Float64}},
     test_wavenumber::Vector{Float64},
     tri_area::Float64,
-)#::(Array{SparseMatrixCSC{ComplexF64,Int64}},Array{SparseMatrixCSC{ComplexF64,Int64}})
+)
     """
-    test_wavenumber
+    Computes and updates components of the convection matrix.
+    
+    This function updates the convection-related matrices using integration over triangular elements,
+    including contributions from time derivatives and spatial gradients.
+    
+    # Arguments
+    - `pDtq_cell::Array{SparseMatrixCSC{ComplexF64,Int64}}`: Array of sparse matrices for time derivative terms.
+    - `vDxeta_cell::Array{SparseMatrixCSC{ComplexF64,Int64}}`: Array of sparse matrices for x-gradient convection terms.
+    - `vDyeta_cell::Array{SparseMatrixCSC{ComplexF64,Int64}}`: Array of sparse matrices for y-gradient convection terms.
+    - `cell_idx::Int`: Index of the current cell.
+    - `triangle_connectivity::SubArray{Int64,1,...}`: Connectivity information for triangles.
+    - `A::Float64, B::Float64, C::Float64`: Coefficients used in integration.
+    - `omega::Vector{Float64}`: Frequency-related parameters.
+    - `dt::Float64`: Time step size.
+    - `t0::Float64`: Initial time.
+    - `gradients::Tuple{Matrix{Float64},Matrix{Float64}}`: Gradient matrices.
+    - `test_wavenumber::Vector{Float64}`: Wavenumber parameters for testing.
+    - `tri_area::Float64`: Area of the triangle element.
+    
+    # Returns
+    - `(Array{SparseMatrixCSC{ComplexF64,Int64}}, Array{SparseMatrixCSC{ComplexF64,Int64}}, Array{SparseMatrixCSC{ComplexF64,Int64}})`: 
+      Updated convection-related matrices for time, x-gradient, and y-gradient terms.
     """
     upper_bounds = [1.0, 1.0, dt]
     lower_bounds = [-1.0, -1.0, 0.0]
@@ -322,6 +372,7 @@ function create_components_convection_matrix(
 
     return pDtq_cell, vDxeta_cell, vDyeta_cell
 end
+
 end
 
 #! # For check the matlab codes

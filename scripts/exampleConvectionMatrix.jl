@@ -59,11 +59,16 @@ _, convection_cell = matrix_comp.compute_sparse_matrix(
 )
 vDxeta_cell = convection_cell[2]
 pDtq_cell = convection_cell[1]
+vDyeta_cell = convection_cell[3]
 vDxeta_cell = permutedims(vDxeta_cell, (2, 1)) #!There is a missing transpose somewhere in the basis operations
 pDtq_cell = permutedims(pDtq_cell, (2, 1)) #!There is a missing transpose somewhere in the basis operations
-
+vDyeta_cell = permutedims(vDyeta_cell, (2, 1))
 pDtq_array = matrix_comp.convert_sparse_cell_to_array(pDtq_cell);
 vDxeta_array = matrix_comp.convert_sparse_cell_to_array(vDxeta_cell);
+vDyeta_array = matrix_comp.convert_sparse_cell_to_array(vDyeta_cell);
+C = [pDtq_array vDxeta_array vDyeta_array;
+     vDxeta_array pDtq_array pDtq_array;
+     vDyeta_array pDtq_array pDtq_array]
 # pDtq_exact = spzeros(size(array, 1), size(array, 2))
 
 using DelimitedFiles
