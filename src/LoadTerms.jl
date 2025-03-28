@@ -55,7 +55,13 @@ function load_term_integration( all_pairs,
     # Initialize outside the if block
     f2x = f1
     f2y = f1
-
+    println(rhs_function)
+    _,_, f2y_term = rhs_function
+    f1_term = rhs_function[1]
+    f2x_term = rhs_function[2]
+    rhs_function[1](1,2,3)  # Assign the function to a variable
+    rhs_function[2](1,2,3)  # Assign the function to a variable
+    rhs_function[3](1,2,3)
     @views for (idx, ii) in enumerate(connectivity_matrix)
 
         triangle_nodes, triangle_connectivity = nodal_transformations(ii, nodes)
@@ -74,7 +80,6 @@ function load_term_integration( all_pairs,
         upper_bounds = [1.0, 1.0, dt]
         lower_bounds = [-1.0, -1.0, 0.0] #! this is wrong as it should be t_0,t_1
  # Integrating ∂ₜp
- f1_term, f2x_term, f2y_term = rhs_function
 #  print(f1_term)
 #  println(typeof(f1_term))
 #  println(typeof(triangle_nodes))

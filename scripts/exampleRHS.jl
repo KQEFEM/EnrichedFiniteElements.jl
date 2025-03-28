@@ -49,7 +49,10 @@ dt = 0.1
 dt =  9.0909e-02
 
 using Revise
-rhs_function = rhs_comp.exact_pressure_0_velocity(1.9,2.0,1.0)  # Assign the function to a variable
+rhs_function = rhs_comp.exact_pressure_0_velocity(1.9,2.0,1.0)
+rhs_function[1](1,2,3)  # Assign the function to a variable
+rhs_function[2](1,2,3)  # Assign the function to a variable
+rhs_function[3](1,2,3)  # Assign the function to a variable
 typeof(rhs_function)
 # Call the load_term_integration function
 f1, f2x, f2y = rhs_comp.load_term_integration(
@@ -62,7 +65,7 @@ f1, f2x, f2y = rhs_comp.load_term_integration(
     t0 = 0,
     rhs_function=rhs_function,  # Pass rhs_function as a keyword argument
     kx = 1.0,
-    ky = 1.0,
+    ky = 0.0,
     w = 1.0
 )
 
