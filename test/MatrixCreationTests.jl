@@ -16,8 +16,6 @@ const wave_func = EnrichedFiniteElements.EnrichmentCreator
 const matrix_comp = EnrichedFiniteElements.MatrixCreation
 #! Set up for the matrix creation
 const domain = ((0, 1), (0, 1))
-
-# Create the mesh
 const mesh = mesh_create.rectangle_domain(domain)
 
 function load_matlab_matrix(filename)
